@@ -1,4 +1,4 @@
-// swift-tools-version:5.4
+// swift-tools-version:5.3
 import PackageDescription
 
 let package:Package = .init(
@@ -32,7 +32,7 @@ let package:Package = .init(
             [
             ]),
         
-        .executableTarget(name: "SHA2Tests", 
+        .target(name: "SHA2Tests", 
             dependencies: 
             [
                 .target(name: "SHA2"),

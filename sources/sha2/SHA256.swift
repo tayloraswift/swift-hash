@@ -1,5 +1,9 @@
+#if swift(>=5.5)
+extension SHA256:Sendable {}
+#endif 
+
 @frozen public
-struct SHA256:RandomAccessCollection, Sendable
+struct SHA256:RandomAccessCollection
 {
     public static 
     let table:[UInt32] = 
