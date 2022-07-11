@@ -1,12 +1,5 @@
 <p align="center">
-  <strong><em><code>hash</code></em></strong><br><small>server-side swift submodule</small>
+  <strong><em><code>hash</code></em></strong><br><code>0.2.0</code>
 </p>
 
-This is a non-resilient Swift submodule. It should be imported as a Git submodule, not an SPM package. 
-
-**This submodule will add the following top-level symbols to your namespace**:
-
-* `struct SHA256`
-* `struct CRC32`
-
-All declarations are `internal`.
+*`swift-hash`* is an inline-only microframework providing generic, pure-swift implementations of the [SHA-2](https://en.wikipedia.org/wiki/SHA-2) and HMAC-SHA-2 hashing functions.
