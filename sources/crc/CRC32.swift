@@ -44,10 +44,10 @@ struct CRC32:Hashable, ExpressibleByIntegerLiteral
         self.update(with: input)
     }
 }
-extension CRC32:CustomStringConvertible 
+/* extension CRC32:CustomStringConvertible 
 {
     var description:String 
     {
         "crc32:\(Base16.encode(self.checksum, as: String.self))"
     }
-}
+} */
