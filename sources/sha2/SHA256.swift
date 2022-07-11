@@ -3,7 +3,7 @@ extension SHA256:Sendable {}
 #endif 
 
 @frozen public
-struct SHA256:RandomAccessCollection
+struct SHA256:RandomAccessCollection, Hashable
 {
     public static 
     let table:[UInt32] = 
@@ -50,6 +50,31 @@ struct SHA256:RandomAccessCollection
                 UInt8.init(($0[index >> 2] << ((index & 3) << 3)) >> 24)
             }
         }
+    }
+    
+    @inlinable public static 
+    func == (lhs:Self, rhs:Self) -> Bool 
+    {
+        lhs.words.0 == rhs.words.0 &&
+        lhs.words.1 == rhs.words.1 &&
+        lhs.words.2 == rhs.words.2 &&
+        lhs.words.3 == rhs.words.3 &&
+        lhs.words.4 == rhs.words.4 &&
+        lhs.words.5 == rhs.words.5 &&
+        lhs.words.6 == rhs.words.6 &&
+        lhs.words.7 == rhs.words.7
+    }
+    @inlinable public 
+    func hash(into hasher:inout Hasher)
+    {
+        self.words.0.hash(into: &hasher)
+        self.words.1.hash(into: &hasher)
+        self.words.2.hash(into: &hasher)
+        self.words.3.hash(into: &hasher)
+        self.words.4.hash(into: &hasher)
+        self.words.5.hash(into: &hasher)
+        self.words.6.hash(into: &hasher)
+        self.words.7.hash(into: &hasher)
     }
     
     @inlinable public 
