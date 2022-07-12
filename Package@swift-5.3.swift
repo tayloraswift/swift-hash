@@ -5,8 +5,9 @@ let package:Package = .init(
     name: "swift-hash",
     products: 
     [
-        .library(name: "CRC",   targets: ["CRC"]),
+        .library(name: "Base16",  targets: ["Base16"]),
         .library(name: "SHA2",  targets: ["SHA2"]),
+        .library(name: "CRC",   targets: ["CRC"]),
         
         .executable(name: "sha2-tests", targets: ["SHA2Tests"]),
     ],
@@ -15,20 +16,14 @@ let package:Package = .init(
     ],
     targets: 
     [
-        .target(name: "CRC", 
-            dependencies: 
-            [
-            ],
-            path: "sources/crc", 
-            exclude: 
-            [
-            ]),
+        .target(name: "Base16"),
         .target(name: "SHA2", 
             dependencies: 
             [
-            ],
-            path: "sources/sha2", 
-            exclude: 
+                .target(name: "Base16"),
+            ]),
+        .target(name: "CRC", 
+            dependencies: 
             [
             ]),
         
@@ -37,9 +32,6 @@ let package:Package = .init(
             [
                 .target(name: "SHA2"),
             ],
-            path: "tests/sha2", 
-            exclude: 
-            [
-            ]),
+            path: "Tests/SHA2"),
     ]
 )

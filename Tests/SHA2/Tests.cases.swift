@@ -80,7 +80,8 @@ extension Tests
             """,
             hmac256:
             """
-            a3b6167473100ee06e0c796c2955552b
+            a3b6167473100ee06e0c796c2955552b\
+            fa6f7c0a6a8aef8b93f860aab0cd20c5
             """
         ),
         (

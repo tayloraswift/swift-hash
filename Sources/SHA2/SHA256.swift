@@ -1,3 +1,5 @@
+import Base16
+
 #if swift(>=5.5)
 extension SHA256:Sendable {}
 #endif 
@@ -5,6 +7,9 @@ extension SHA256:Sendable {}
 @frozen public
 struct SHA256:RandomAccessCollection, Hashable
 {
+    public 
+    typealias Words = (UInt32, UInt32, UInt32, UInt32, UInt32, UInt32, UInt32, UInt32)
+    
     public static 
     let table:[UInt32] = 
     [
@@ -27,7 +32,7 @@ struct SHA256:RandomAccessCollection, Hashable
     ]
     
     public
-    var words:(UInt32, UInt32, UInt32, UInt32, UInt32, UInt32, UInt32, UInt32)
+    var words:Words
     
     @inlinable public 
     var startIndex:Int 
@@ -78,19 +83,19 @@ struct SHA256:RandomAccessCollection, Hashable
     }
     
     @inlinable public 
-    init() 
+    init(words:Words = 
+    (
+        0x6a09e667,
+        0xbb67ae85,
+        0x3c6ef372,
+        0xa54ff53a,
+        0x510e527f,
+        0x9b05688c,
+        0x1f83d9ab,
+        0x5be0cd19
+    )) 
     {
-        self.words = 
-        (
-            0x6a09e667,
-            0xbb67ae85,
-            0x3c6ef372,
-            0xa54ff53a,
-            0x510e527f,
-            0x9b05688c,
-            0x1f83d9ab,
-            0x5be0cd19
-        )
+        self.words = words 
     }
     
     @inlinable public 
@@ -176,11 +181,7 @@ struct SHA256:RandomAccessCollection, Hashable
             }
         }
         
-        var (a, b, c, d, e, f, g, h):
-        (
-            UInt32, UInt32, UInt32, UInt32, 
-            UInt32, UInt32, UInt32, UInt32
-        ) = self.words
+        var (a, b, c, d, e, f, g, h):Words = self.words
         
         for i:Int in 0 ..< 64 
         {
@@ -250,5 +251,57 @@ extension SHA256
         let inner:[UInt8] = normalized.map { $0 ^ 0x36 },
             outer:[UInt8] = normalized.map { $0 ^ 0x5c }
         return .init(hashing: outer + Self.init(hashing: inner + message))
+    }
+}
+
+extension SHA256:ExpressibleByStringLiteral 
+{
+    @inlinable public 
+    init?<UTF8>(parsing utf8:UTF8) where UTF8:Sequence, UTF8.Element == UInt8
+    {
+        guard let words:Words = Base16.decodeBigEndian(utf8: utf8, as: Words.self)
+        else 
+        {
+            return nil
+        }
+        self.words.0 = .init(bigEndian: words.0)
+        self.words.1 = .init(bigEndian: words.1)
+        self.words.2 = .init(bigEndian: words.2)
+        self.words.3 = .init(bigEndian: words.3)
+        self.words.4 = .init(bigEndian: words.4)
+        self.words.5 = .init(bigEndian: words.5)
+        self.words.6 = .init(bigEndian: words.6)
+        self.words.7 = .init(bigEndian: words.7)
+    }
+    
+    @inlinable public 
+    init(stringLiteral:String)
+    {
+        if let hash:Self = .init(parsing: stringLiteral.utf8)
+        {
+            self = hash
+        }
+        else 
+        {
+            fatalError("invalid hex literal '\(stringLiteral)'")
+        }
+    }
+}
+extension SHA256:CustomStringConvertible 
+{
+    @inlinable public 
+    var description:String 
+    {
+        Base16.encodeBigEndian(lowercasing:
+        (
+            self.words.0.bigEndian, 
+            self.words.1.bigEndian, 
+            self.words.2.bigEndian, 
+            self.words.3.bigEndian, 
+            self.words.4.bigEndian, 
+            self.words.5.bigEndian, 
+            self.words.6.bigEndian, 
+            self.words.7.bigEndian
+        ))
     }
 }
