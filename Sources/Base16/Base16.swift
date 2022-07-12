@@ -104,12 +104,12 @@ enum Base16
         #if os(macOS)
         if #available(macOS 11.0, *)
         {
-            .init(decoding: try Self.encodeBigEndian(words, as: [UInt8].self, by: ascii), 
+            return .init(decoding: try Self.encodeBigEndian(words, as: [UInt8].self, by: ascii), 
                 as: Unicode.UTF8.self)
         }
         else 
         {
-            try .init(unsafeUninitializedCapacity: 2 * MemoryLayout<Words>.size)
+            return try .init(unsafeUninitializedCapacity: 2 * MemoryLayout<Words>.size)
             {
                 var utf8:UnsafeMutableBufferPointer<UInt8> = $0
                 try Self.encodeBigEndian(words, utf8: &utf8, by: ascii)
