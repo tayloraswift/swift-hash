@@ -1,4 +1,4 @@
-name: tests
+name: build
 
 on:
     push:
@@ -18,7 +18,6 @@ jobs:
                 run: |
                     swift --version
                     swift run -c release sha2-tests
-                    xcrun xcodebuild build -scheme "swift-hash-Package" -destination "generic/platform=ios"
     build-linux:
         runs-on: ${{ matrix.os }}
         strategy:
