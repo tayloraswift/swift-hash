@@ -124,7 +124,7 @@ enum Base16
             return $0.count
         }
         #else 
-        .init(decoding: try Self.encodeBigEndian(words, as: [UInt8].self, by: ascii), 
+        return .init(decoding: try Self.encodeBigEndian(words, as: [UInt8].self, by: ascii), 
             as: Unicode.UTF8.self)
         #endif 
     }
