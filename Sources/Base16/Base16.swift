@@ -101,8 +101,8 @@ enum Base16
     func encodeBigEndian<Words>(_ words:Words, as _:String.Type = String.self, 
         by ascii:(UInt8) throws -> UInt8) rethrows -> String
     {
-        #if os(macOS)
-        if #available(macOS 11.0, *)
+        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS) 
+        if #available(macOS 11.0, iOS 14.0, tvOS 14.0, watchOS 14.0, *)
         {
             return try .init(unsafeUninitializedCapacity: 2 * MemoryLayout<Words>.size)
             {
