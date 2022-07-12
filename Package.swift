@@ -1,20 +1,37 @@
 // swift-tools-version:5.4
 import PackageDescription
 
+#if os(iOS) || os(tvOS) || os(watchOS) 
+let tools:[Product] = []
+let executables:[Target] = []
+#else 
+let tools:[Product] = 
+[
+    .executable(name: "sha2-tests", targets: ["SHA2Tests"]),
+]
+let executables:[Target] = 
+[
+    .executableTarget(name: "SHA2Tests", 
+        dependencies: 
+        [
+            .target(name: "SHA2"),
+        ],
+        path: "Tests/SHA2"),
+]
+#endif 
+
 let package:Package = .init(
     name: "swift-hash",
-    products: 
+    products: tools +
     [
         .library(name: "Base16",  targets: ["Base16"]),
         .library(name: "SHA2",  targets: ["SHA2"]),
         .library(name: "CRC",   targets: ["CRC"]),
-        
-        .executable(name: "sha2-tests", targets: ["SHA2Tests"]),
     ],
     dependencies: 
     [
     ],
-    targets: 
+    targets: executables +
     [
         .target(name: "Base16"),
         .target(name: "SHA2", 
@@ -26,12 +43,5 @@ let package:Package = .init(
             dependencies: 
             [
             ]),
-        
-        .executableTarget(name: "SHA2Tests", 
-            dependencies: 
-            [
-                .target(name: "SHA2"),
-            ],
-            path: "Tests/SHA2"),
     ]
 )
