@@ -1,6 +1,6 @@
 <div align="center">
   
-***`hash`***<br>`0.2.1`
+***`hash`***<br>`0.2.2`
   
 [![ci status](https://github.com/kelvin13/swift-hash/actions/workflows/tests.yml/badge.svg)](https://github.com/kelvin13/swift-hash/actions/workflows/tests.yml)
 
