@@ -264,14 +264,17 @@ extension SHA256:ExpressibleByStringLiteral
         {
             return nil
         }
-        self.words.0 = .init(bigEndian: words.0)
-        self.words.1 = .init(bigEndian: words.1)
-        self.words.2 = .init(bigEndian: words.2)
-        self.words.3 = .init(bigEndian: words.3)
-        self.words.4 = .init(bigEndian: words.4)
-        self.words.5 = .init(bigEndian: words.5)
-        self.words.6 = .init(bigEndian: words.6)
-        self.words.7 = .init(bigEndian: words.7)
+        self.init(words: 
+        (
+            .init(bigEndian: words.0),
+            .init(bigEndian: words.1),
+            .init(bigEndian: words.2),
+            .init(bigEndian: words.3),
+            .init(bigEndian: words.4),
+            .init(bigEndian: words.5),
+            .init(bigEndian: words.6),
+            .init(bigEndian: words.7)
+        ))
     }
     
     @inlinable public 
