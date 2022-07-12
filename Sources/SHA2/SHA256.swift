@@ -259,11 +259,24 @@ extension SHA256:ExpressibleByStringLiteral
     @inlinable public 
     init?<UTF8>(parsing utf8:UTF8) where UTF8:Sequence, UTF8.Element == UInt8
     {
+        #if swift(>=5.6)
         guard let words:Words = Base16.decodeBigEndian(utf8: utf8, as: Words.self)
         else 
         {
             return nil
         }
+        #else 
+        var words:Words = (0, 0, 0, 0, 0, 0, 0, 0)
+        guard let _:Void = withUnsafeMutableBytes(of: &words, 
+        { 
+            var words:UnsafeMutableRawBufferPointer = $0
+            return Base16.decodeBigEndian(utf8: utf8, words: &words) 
+        })
+        else 
+        {
+            return nil
+        }
+        #endif
         self.init(words: 
         (
             .init(bigEndian: words.0),

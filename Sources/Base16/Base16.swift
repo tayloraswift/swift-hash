@@ -46,6 +46,7 @@ enum Base16
         return bytes
     }
     
+    #if swift(>=5.6)
     @inlinable public static 
     func decodeBigEndian<UTF8, Words>(utf8:UTF8, as _:Words.Type = Words.self) -> Words? 
         where UTF8:Sequence, UTF8.Element == UInt8
@@ -54,23 +55,46 @@ enum Base16
             byteCount: MemoryLayout<Words>.size, 
             alignment: MemoryLayout<Words>.alignment)
         {
-            var utf8:UTF8.Iterator = utf8.makeIterator()
-            for offset:Int in $0.indices 
+            var words:UnsafeMutableRawBufferPointer = $0
+            if case _? = Self.decodeBigEndian(utf8: utf8, words: &words)
             {
-                if  let first:UInt8 = utf8.next(), 
-                    let second:UInt8 = utf8.next(), 
-                    let high:UInt8 = Self.value(ascii: first),
-                    let low:UInt8 = Self.value(ascii: second)
-                {
-                    $0[offset] = high << 4 | low
-                }
-                else 
-                {
-                    return nil 
-                }
+                return $0.load(as: Words.self)
             }
-            return $0.load(as: Words.self)
+            else 
+            {
+                return nil
+            }
         }
+    }
+    #else 
+    @available(*, unavailable) public static 
+    func decodeBigEndian<UTF8, Words>(utf8:UTF8, as _:Words.Type = Words.self) -> Words? 
+        where UTF8:Sequence, UTF8.Element == UInt8
+    {
+        fatalError()
+    }
+    #endif
+    @inlinable public static 
+    func decodeBigEndian<UTF8, Words>(utf8:UTF8, words:inout Words) -> Void? 
+        where   UTF8:Sequence, UTF8.Element == UInt8, 
+                Words:MutableCollection, Words.Element == UInt8
+    {
+        var utf8:UTF8.Iterator = utf8.makeIterator()
+        for offset:Words.Index in words.indices 
+        {
+            if  let first:UInt8 = utf8.next(), 
+                let second:UInt8 = utf8.next(), 
+                let high:UInt8 = Self.value(ascii: first),
+                let low:UInt8 = Self.value(ascii: second)
+            {
+                words[offset] = high << 4 | low
+            }
+            else 
+            {
+                return nil 
+            }
+        }
+        return ()
     }
     
     @inlinable public static 
