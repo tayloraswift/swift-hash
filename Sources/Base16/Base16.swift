@@ -101,13 +101,31 @@ enum Base16
     func encodeBigEndian<Words>(_ words:Words, as _:String.Type = String.self, 
         by ascii:(UInt8) throws -> UInt8) rethrows -> String
     {
+        #if os(macOS)
+        if #available(macOS 11.0, *)
+        {
+            .init(decoding: try Self.encodeBigEndian(words, as: [UInt8].self, by: ascii), 
+                as: Unicode.UTF8.self)
+        }
+        else 
+        {
+            try .init(unsafeUninitializedCapacity: 2 * MemoryLayout<Words>.size)
+            {
+                var utf8:UnsafeMutableBufferPointer<UInt8> = $0
+                try Self.encodeBigEndian(words, utf8: &utf8, by: ascii)
+                return $0.count
+            }
+        }
+        #else 
         try .init(unsafeUninitializedCapacity: 2 * MemoryLayout<Words>.size)
         {
             var utf8:UnsafeMutableBufferPointer<UInt8> = $0
             try Self.encodeBigEndian(words, utf8: &utf8, by: ascii)
             return $0.count
         }
+        #endif 
     }
+    
     @inlinable public static 
     func encodeBigEndian<Words>(lowercasing words:Words, as _:String.Type = String.self) 
         -> String

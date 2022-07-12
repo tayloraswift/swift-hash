@@ -293,7 +293,7 @@ extension SHA256:ExpressibleByStringLiteral
     @inlinable public 
     init(stringLiteral:String)
     {
-        if let hash:Self = .init(parsing: stringLiteral.utf8)
+        if let hash:Self = Self.init(parsing: stringLiteral.utf8)
         {
             self = hash
         }
