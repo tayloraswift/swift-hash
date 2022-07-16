@@ -1,4 +1,4 @@
-name: build-ios
+name: build-devices
 
 on:
     push:
@@ -7,7 +7,7 @@ on:
         branches: [ master ]
 
 jobs:
-    build-macos:
+    build-ios:
         runs-on: ${{ matrix.os }}
         strategy:
             matrix:
@@ -18,5 +18,25 @@ jobs:
                 run: |
                     swift --version
                     xcrun xcodebuild build -scheme "SHA2" -destination "generic/platform=ios"
+    build-tvos:
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                os: [macos-11, macos-10.15]
+        steps:
+            -   uses: actions/checkout@v2
+            -   name: build 
+                run: |
+                    swift --version
                     xcrun xcodebuild build -scheme "SHA2" -destination "generic/platform=tvos"
+    build-watchos:
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                os: [macos-11, macos-10.15]
+        steps:
+            -   uses: actions/checkout@v2
+            -   name: build 
+                run: |
+                    swift --version
                     xcrun xcodebuild build -scheme "SHA2" -destination "generic/platform=watchos"

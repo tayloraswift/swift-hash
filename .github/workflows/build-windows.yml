@@ -1,0 +1,25 @@
+name: build-windows
+
+on:
+    push:
+        branches: [ master ]
+    pull_request:
+        branches: [ master ]
+
+jobs:
+    build-windows:
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                os: [windows-2022, windows-2019]
+                swift: [5.6.2, 5.5.3, 5.4.3]
+        steps:
+            -   uses: actions/checkout@v2
+            
+            -   name: build 
+                uses: MaxDesiatov/swift-windows-action@v1
+                with:
+                    swift-version: "${{ matrix.swift }}"
+                    shell-action: |
+                        swift --version
+                        swift run -c release sha2-tests
