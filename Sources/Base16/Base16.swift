@@ -101,14 +101,15 @@ enum Base16
     func encodeBigEndian<Words>(_ words:Words, as _:String.Type = String.self, 
         by ascii:(UInt8) throws -> UInt8) rethrows -> String
     {
+        let bytes:Int = 2 * MemoryLayout<Words>.size
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS) 
         if #available(macOS 11.0, iOS 14.0, tvOS 14.0, watchOS 14.0, *)
         {
-            return try .init(unsafeUninitializedCapacity: 2 * MemoryLayout<Words>.size)
+            return try .init(unsafeUninitializedCapacity: bytes)
             {
                 var utf8:UnsafeMutableBufferPointer<UInt8> = $0
                 try Self.encodeBigEndian(words, utf8: &utf8, by: ascii)
-                return $0.count
+                return bytes
             }
         }
         else 
@@ -117,11 +118,11 @@ enum Base16
                 as: Unicode.UTF8.self)
         }
         #elseif swift(>=5.4)
-        try .init(unsafeUninitializedCapacity: 2 * MemoryLayout<Words>.size)
+        return try .init(unsafeUninitializedCapacity: bytes)
         {
             var utf8:UnsafeMutableBufferPointer<UInt8> = $0
             try Self.encodeBigEndian(words, utf8: &utf8, by: ascii)
-            return $0.count
+            return bytes
         }
         #else 
         return .init(decoding: try Self.encodeBigEndian(words, as: [UInt8].self, by: ascii), 
@@ -158,10 +159,11 @@ enum Base16
     func encodeBigEndian<Words>(_ words:Words, as _:[UInt8].Type = [UInt8].self, 
         by ascii:(UInt8) throws -> UInt8) rethrows -> [UInt8]
     {
-        try .init(unsafeUninitializedCapacity: 2 * MemoryLayout<Words>.size)
+        let bytes:Int = 2 * MemoryLayout<Words>.size
+        return try .init(unsafeUninitializedCapacity: bytes)
         {
             try Self.encodeBigEndian(words, utf8: &$0, by: ascii)
-            $1 = $0.count
+            $1 = bytes
         }
     }
     
@@ -184,7 +186,7 @@ enum Base16
     {
         try withUnsafeBytes(of: words)
         {
-            assert(utf8.count == $0.count * 2)
+            assert(2 * $0.count <= utf8.count)
             
             var offset:UTF8.Index = utf8.startIndex
             for byte:UInt8 in $0 

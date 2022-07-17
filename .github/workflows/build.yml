@@ -17,6 +17,7 @@ jobs:
             -   name: build 
                 run: |
                     swift --version
+                    swift run -c release crc-tests
                     swift run -c release sha2-tests
     build-linux:
         runs-on: ${{ matrix.os }}
@@ -51,4 +52,5 @@ jobs:
             -   name: build 
                 run: |
                     swift --version
+                    swift run -c release crc-tests
                     swift run -c release sha2-tests

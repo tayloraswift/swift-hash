@@ -17,6 +17,7 @@ jobs:
             -   name: build 
                 run: |
                     swift --version
+                    xcrun xcodebuild build -scheme "CRC"  -destination "generic/platform=ios"
                     xcrun xcodebuild build -scheme "SHA2" -destination "generic/platform=ios"
     build-tvos:
         runs-on: ${{ matrix.os }}
@@ -28,6 +29,7 @@ jobs:
             -   name: build 
                 run: |
                     swift --version
+                    xcrun xcodebuild build -scheme "CRC"  -destination "generic/platform=tvos"
                     xcrun xcodebuild build -scheme "SHA2" -destination "generic/platform=tvos"
     build-watchos:
         runs-on: ${{ matrix.os }}
@@ -39,4 +41,5 @@ jobs:
             -   name: build 
                 run: |
                     swift --version
+                    xcrun xcodebuild build -scheme "CRC"  -destination "generic/platform=watchos"
                     xcrun xcodebuild build -scheme "SHA2" -destination "generic/platform=watchos"

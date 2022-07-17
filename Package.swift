@@ -7,10 +7,17 @@ let executables:[Target] = []
 #else 
 let tools:[Product] = 
 [
+    .executable(name: "crc-tests",  targets: ["CRCTests"]),
     .executable(name: "sha2-tests", targets: ["SHA2Tests"]),
 ]
 let executables:[Target] = 
 [
+    .executableTarget(name: "CRCTests", 
+        dependencies: 
+        [
+            .target(name: "CRC"),
+        ],
+        path: "Tests/CRC"),
     .executableTarget(name: "SHA2Tests", 
         dependencies: 
         [
@@ -42,6 +49,7 @@ let package:Package = .init(
         .target(name: "CRC", 
             dependencies: 
             [
+                .target(name: "Base16"),
             ]),
     ]
 )
