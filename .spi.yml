@@ -2,8 +2,8 @@ version: 1
 builder:
     configs:
     -   platform: ios
-        scheme: SHA2 iOS
+        scheme: SHA2 
     -   platform: tvos
-        scheme: SHA2 tvOS
+        scheme: SHA2 
     -   platform: watchos
-        scheme: SHA2 watchOS
+        scheme: SHA2 

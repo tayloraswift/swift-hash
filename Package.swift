@@ -32,8 +32,8 @@ let package:Package = .init(
     products: tools +
     [
         .library(name: "Base16",  targets: ["Base16"]),
-        .library(name: "SHA2",  targets: ["SHA2"]),
-        .library(name: "CRC",   targets: ["CRC"]),
+        .library(name: "SHA2", targets: ["SHA2"]),
+        .library(name: "CRC", targets: ["CRC"]),
     ],
     dependencies: 
     [
