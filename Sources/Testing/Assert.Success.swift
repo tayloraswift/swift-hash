@@ -3,6 +3,19 @@ extension Assert
     public
     struct Success:CustomStringConvertible
     {
+        #if swift(<5.7)
+
+        public
+        let caught:Error
+
+        public
+        init(caught:Error)
+        {
+            self.caught = caught
+        }
+
+        #else
+
         public
         let caught:any Error
 
@@ -11,6 +24,9 @@ extension Assert
         {
             self.caught = caught
         }
+        
+        #endif
+
         public 
         var description:String
         {

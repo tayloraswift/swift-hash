@@ -3,8 +3,15 @@ struct UnitTests
 {
     public private(set)
     var passed:Int
+
+    #if swift(<5.7)
+    public private(set)
+    var failed:[Error]
+    #else
     public private(set)
     var failed:[any Error]
+    #endif
+
     private
     var scope:[String]
 
@@ -54,7 +61,7 @@ extension UnitTests
     private
     func scope(name:String?) -> String
     {
-        if let name:String
+        if let name:String = name
         {
             return self.scope.isEmpty ? name :
                 "\(self.scope.joined(separator: ".")).\(name)"
@@ -75,6 +82,8 @@ extension UnitTests
         }
         return run(&self)
     }
+
+    #if swift(>=5.5)
     @discardableResult
     public mutating
     func group<T>(_ name:String, running run:@Sendable (inout Self) async -> T) async -> T
@@ -86,6 +95,8 @@ extension UnitTests
         }
         return await run(&self)
     }
+    #endif
+    
     public
     func summarize() throws
     {
@@ -95,10 +106,19 @@ extension UnitTests
             return
         }
         print("failed: \(self.failed.count) test(s)")
+
+        #if swift(<5.7)
+        for (ordinal, failure):(Int, Error) in self.failed.enumerated()
+        {
+            print("\(ordinal). \(failure)")
+        }
+        #else
         for (ordinal, failure):(Int, any Error) in self.failed.enumerated()
         {
             print("\(ordinal). \(failure)")
         }
+        #endif
+
         throw Failures.init()
     }
 }
@@ -130,7 +150,7 @@ extension UnitTests
         line:Int = #line, 
         column:Int = #column) 
     {
-        if let failure:Assert.Equivalence<T>
+        if let failure:Assert.Equivalence<T> = failure
         {
             self.failed.append(Failure<Assert.Equivalence<T>>.init(failure,
                 location: .init(function: function, file: file, line: line, column: column),
@@ -220,6 +240,8 @@ extension UnitTests
             scope: self.scope(name: name)))
     }
 }
+
+#if swift(>=5.5)
 extension UnitTests
 {
     @discardableResult
@@ -275,3 +297,4 @@ extension UnitTests
             scope: self.scope(name: name)))
     }
 }
+#endif
