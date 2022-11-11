@@ -84,6 +84,7 @@ extension UnitTests
     }
 
     #if swift(>=5.5)
+    @available(macOS 10.5, iOS 13, tvOS 13, watchOS 6, *)
     @discardableResult
     public mutating
     func group<T>(_ name:String, running run:@Sendable (inout Self) async -> T) async -> T
@@ -242,6 +243,7 @@ extension UnitTests
 }
 
 #if swift(>=5.5)
+@available(macOS 10.5, iOS 13, tvOS 13, watchOS 6, *)
 extension UnitTests
 {
     @discardableResult
