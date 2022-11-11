@@ -19,8 +19,8 @@ extension Base64
 extension Base64.Values
 {
     @inlinable public static 
-    subscript(codepoint:UInt8) -> UInt8
+    subscript(digit:UInt8) -> UInt8
     {
-        0x2B ... 0x7A ~= codepoint ? Self.table[Int.init(codepoint - 0x2B)] : 0
+        0x2B ... 0x7A ~= digit ? Self.table[Int.init(digit - 0x2B)] : 0
     }
 }

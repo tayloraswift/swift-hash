@@ -62,6 +62,6 @@ extension CRC32:CustomStringConvertible
     @inlinable public 
     var description:String 
     {
-        Base16.encodeBigEndian(lowercasing: self.checksum.bigEndian)
+        Base16.encode(storing: self.checksum.bigEndian, with: Base16.LowercaseDigits.self)
     }
 }

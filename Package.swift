@@ -48,9 +48,19 @@ let package:Package = .init(
     ],
     targets: executables +
     [
-        .target(name: "Base16"),
+        .target(name: "BaseDigits"),
 
-        .target(name: "Base64"),
+        .target(name: "Base16", 
+            dependencies: 
+            [
+                .target(name: "BaseDigits"),
+            ]),
+
+        .target(name: "Base64", 
+            dependencies: 
+            [
+                .target(name: "BaseDigits"),
+            ]),
 
         .target(name: "SHA2", 
             dependencies: 

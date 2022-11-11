@@ -1,6 +1,6 @@
 import Testing
 
-@main 
+@main
 enum Main
 {
     static
