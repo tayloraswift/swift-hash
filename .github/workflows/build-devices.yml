@@ -7,16 +7,19 @@ on:
         branches: [ master ]
 
 jobs:
-    build-macos:
+    devices:
         runs-on: ${{ matrix.os }}
         strategy:
             matrix:
-                os: [macos-12, macos-11]
+                os: [macos-12]
                 device: [ios, tvos, watchos]
         steps:
             -   uses: actions/checkout@v2
             -   name: build 
                 run: |
                     swift --version
-                    xcrun xcodebuild build -scheme "CRC"  -destination "generic/platform=${{ matrix.device }}"
+                    xcrun xcodebuild -list
+                    xcrun xcodebuild build -scheme "Base16" -destination "generic/platform=${{ matrix.device }}"
+                    xcrun xcodebuild build -scheme "Base64" -destination "generic/platform=${{ matrix.device }}"
+                    xcrun xcodebuild build -scheme "CRC" -destination "generic/platform=${{ matrix.device }}"
                     xcrun xcodebuild build -scheme "SHA2" -destination "generic/platform=${{ matrix.device }}"
