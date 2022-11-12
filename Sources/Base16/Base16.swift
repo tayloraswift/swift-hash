@@ -1,8 +1,17 @@
 import BaseDigits
 
+/// A namespace for base-16 utilities.
 public 
-enum Base16 
+enum Base16
 {
+    /// Decodes some ``String``-like type containing an ASCII-encoded base-16 string
+    /// to some ``RangeReplaceableCollection`` type. The order of the decoded bytes
+    /// in the output matches the order of the (pairs of) hexadecimal digits in the
+    /// input string.
+    ///
+    /// Characters (including UTF-8 continuation bytes) that are not base-16 digits
+    /// will be interpreted as zeros. If the string does not contain an even number
+    /// of digits, the trailing digit will be ignored.
     @inlinable public static 
     func decode<ASCII, Bytes>(_ ascii:ASCII, to _:Bytes.Type = Bytes.self) -> Bytes
         where   Bytes:RangeReplaceableCollection, Bytes.Element == UInt8,
@@ -10,6 +19,13 @@ enum Base16
     {
         self.decode(ascii.utf8, to: Bytes.self)
     }
+    /// Decodes an ASCII-encoded base-16 string to some ``RangeReplaceableCollection`` type.
+    /// The order of the decoded bytes in the output matches the order of the (pairs of)
+    /// hexadecimal digits in the input.
+    ///
+    /// Characters (including UTF-8 continuation bytes) that are not base-16 digits
+    /// will be interpreted as zeros. If the input does not yield an even number of
+    /// digits, the trailing digit will be ignored.
     @inlinable public static 
     func decode<ASCII, Bytes>(_ ascii:ASCII, to _:Bytes.Type = Bytes.self) -> Bytes
         where   Bytes:RangeReplaceableCollection, Bytes.Element == UInt8,
@@ -25,7 +41,7 @@ enum Base16
         }
         return bytes
     }
-
+    /// Encodes a sequence of bytes to a base-16 string with the specified lettercasing.
     @inlinable public static 
     func encode<Bytes, Digits>(_ bytes:Bytes, with _:Digits.Type) -> String
         where Bytes:Sequence, Bytes.Element == UInt8, Digits:BaseDigits
@@ -42,6 +58,12 @@ enum Base16
 }
 extension Base16
 {
+    /// Decodes an ASCII-encoded base-16 string into a pre-allocated buffer,
+    /// returning [`nil`]() if the input did not yield enough bytes to fill
+    /// the buffer completely.
+    ///
+    /// Characters (including UTF-8 continuation bytes) that are not base-16 digits
+    /// will be interpreted as zeros.
     @inlinable public static 
     func decode<ASCII>(_ ascii:ASCII,
         into bytes:UnsafeMutableRawBufferPointer) -> Void?
@@ -62,6 +84,13 @@ extension Base16
         }
         return ()
     }
+    /// Encodes a sequence of bytes into a pre-allocated buffer as a base-16
+    /// string with the specified lettercasing.
+    ///
+    /// The size of the `ascii` buffer must be exactly twice the inline size
+    /// of `words`. If this method is used incorrectly, the output buffer may
+    /// be incompletely initialized, but it will never write to memory outside
+    /// of the buffer’s bounds.
     @inlinable public static
     func encode<BigEndian, Digits>(storing words:BigEndian,
         into ascii:UnsafeMutableRawBufferPointer,
@@ -72,21 +101,22 @@ extension Base16
         {
             assert(2 * $0.count <= ascii.count)
             
-            var offset:Int = ascii.startIndex
-            for byte:UInt8 in $0 
+            for (offset, byte):(Int, UInt8)
+                in zip(stride(from: ascii.startIndex, to: ascii.endIndex, by: 2), $0)
             {
-                ascii[offset] = Digits[byte >> 4]
-                ascii.formIndex(after: &offset)
-                ascii[offset] = Digits[byte & 0x0f]
-                ascii.formIndex(after: &offset)
+                ascii[offset    ] = Digits[byte >> 4]
+                ascii[offset + 1] = Digits[byte & 0x0f]
             }
         }
     }
 }
 extension Base16
-{    
+{
     #if swift(>=5.6)
-    @inlinable public static 
+    /// Decodes an ASCII-encoded base-16 string to some (usually trivial) type.
+    /// This is essentially the same as loading values from raw memory, so this
+    /// method should only be used to load trivial types.
+    @inlinable public static
     func decode<ASCII, BigEndian>(_ ascii:ASCII,
         loading _:BigEndian.Type = BigEndian.self) -> BigEndian? 
         where ASCII:Sequence, ASCII.Element == UInt8
@@ -116,13 +146,19 @@ extension Base16
     }
     #endif
 
-    
+    /// Encodes the raw bytes of the given value to a base-16 string with the
+    /// specified lettercasing. The bytes with the lowest addresses appear first
+    /// in the encoded output.
+    ///
+    /// This method is slightly faster than calling ``encode(_:with:)`` on an
+    /// unsafe buffer-pointer view of `words`.
     @inlinable public static 
     func encode<BigEndian, Digits>(storing words:BigEndian,
         with _:Digits.Type) -> String
         where Digits:BaseDigits
     {
         let bytes:Int = 2 * MemoryLayout<BigEndian>.size
+        
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS) 
         if #available(macOS 11.0, iOS 14.0, tvOS 14.0, watchOS 14.0, *)
         {
@@ -134,13 +170,19 @@ extension Base16
                 return bytes
             }
         }
-        else 
-        {
-            return .init(
-                decoding: try Self.encode(storing: words, to: [UInt8].self, with: Digits.self), 
-                as: Unicode.UTF8.self)
-        }
-        #elseif swift(>=5.4)
+        #endif
+
+        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS) || swift(<5.4)
+        return .init(
+            decoding: [UInt8].init(unsafeUninitializedCapacity: bytes)
+            {
+                Self.encode(storing: words,
+                    into: UnsafeMutableRawBufferPointer.init($0),
+                    with: Digits.self)
+                $1 = bytes
+            },
+            as: Unicode.UTF8.self)
+        #else
         return .init(unsafeUninitializedCapacity: bytes)
         {
             Self.encode(storing: words,
@@ -148,25 +190,6 @@ extension Base16
                 with: Digits.self)
             return bytes
         }
-        #else 
-        return .init(
-            decoding: try Self.encode(storing: words, to: [UInt8].self, with: Digits.self), 
-            as: Unicode.UTF8.self)
         #endif 
-    }
-    
-    @inlinable public static 
-    func encode<BigEndian, Digits>(storing words:BigEndian, to _:[UInt8].Type,
-        with _:Digits.Type) -> [UInt8]
-        where Digits:BaseDigits
-    {
-        let bytes:Int = 2 * MemoryLayout<BigEndian>.size
-        return .init(unsafeUninitializedCapacity: bytes)
-        {
-            Self.encode(storing: words,
-                into: UnsafeMutableRawBufferPointer.init($0),
-                with: Digits.self)
-            $1 = bytes
-        }
     }
 }
