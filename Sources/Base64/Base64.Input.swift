@@ -1,17 +1,21 @@
 extension Base64 
 {
-    /// An abstraction over text input, which discards ASCII whitespace
-    /// characters.
+    /// An abstraction over text input, which discards the ASCII whitespace
+    /// characters [`'\t'`](), [`'\n'`](), [`'\f'`](), [`'\r'`](), and [`' '`]().
+    ///
+    /// Iteration over an instance of this type will halt upon encountering the
+    /// first [`'='`]() padding character, even if the underlying sequence contains
+    /// more characters.
     @frozen public
-    struct Input<UTF8> where UTF8:Sequence, UTF8.Element == UInt8
+    struct Input<ASCII> where ASCII:Sequence, ASCII.Element == UInt8
     {
         public
-        var iterator:UTF8.Iterator
+        var iterator:ASCII.Iterator
 
         @inlinable public
-        init(_ utf8:UTF8)
+        init(_ ascii:ASCII)
         {
-            self.iterator = utf8.makeIterator()
+            self.iterator = ascii.makeIterator()
         }
     }
 }

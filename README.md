@@ -1,6 +1,6 @@
 <div align="center">
   
-***`hash`***<br>`0.2.3`
+***`hash`***<br>`0.3.0`
   
 [![ci status](https://github.com/kelvin13/swift-hash/actions/workflows/build.yml/badge.svg)](https://github.com/kelvin13/swift-hash/actions/workflows/build.yml)
 [![ci status](https://github.com/kelvin13/swift-hash/actions/workflows/build-devices.yml/badge.svg)](https://github.com/kelvin13/swift-hash/actions/workflows/build-devices.yml)
@@ -12,4 +12,24 @@
 
 </div>
 
-*`swift-hash`* is an inline-only microframework providing generic, pure-Swift implementations of the [SHA-2](https://en.wikipedia.org/wiki/SHA-2) and HMAC-SHA-2 hashing functions.
+*`swift-hash`* is an inline-only microframework providing generic, pure-Swift implementations of various hashes, checksums, and binary utilities.
+
+## products
+
+The package vends the following library products:
+
+1.  [`Base16`](Sources/Base16)
+
+    Tools for encoding to and decoding from base-16 strings.
+
+1.  [`Base64`](Sources/Base64)
+
+    Tools for encoding to and decoding from base-64 strings.
+
+1.  [`CRC`](Sources/CRC)
+
+    Implements [CRC-32](https://en.wikipedia.org/wiki/Cyclic_redundancy_check) checksums.
+
+1.  [`SHA2`](Sources/SHA2)
+
+    Implements the [SHA-256](https://en.wikipedia.org/wiki/SHA-2) and HMAC-SHA-256 hashing functions.
