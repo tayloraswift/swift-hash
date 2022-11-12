@@ -257,10 +257,10 @@ extension SHA256
 extension SHA256:ExpressibleByStringLiteral 
 {
     @inlinable public 
-    init?<UTF8>(parsing utf8:UTF8) where UTF8:Sequence, UTF8.Element == UInt8
+    init?<ASCII>(parsing ascii:ASCII) where ASCII:Sequence, ASCII.Element == UInt8
     {
         #if swift(>=5.6)
-        guard let words:Words = Base16.decodeBigEndian(utf8: utf8, as: Words.self)
+        guard let words:Words = Base16.decode(ascii, loading: Words.self)
         else 
         {
             return nil
@@ -269,8 +269,7 @@ extension SHA256:ExpressibleByStringLiteral
         var words:Words = (0, 0, 0, 0, 0, 0, 0, 0)
         guard let _:Void = withUnsafeMutableBytes(of: &words, 
         { 
-            var words:UnsafeMutableRawBufferPointer = $0
-            return Base16.decodeBigEndian(utf8: utf8, words: &words) 
+            return Base16.decode(ascii, into: $0) 
         })
         else 
         {
@@ -308,7 +307,7 @@ extension SHA256:CustomStringConvertible
     @inlinable public 
     var description:String 
     {
-        Base16.encodeBigEndian(lowercasing:
+        Base16.encode(storing:
         (
             self.words.0.bigEndian, 
             self.words.1.bigEndian, 
@@ -318,6 +317,7 @@ extension SHA256:CustomStringConvertible
             self.words.5.bigEndian, 
             self.words.6.bigEndian, 
             self.words.7.bigEndian
-        ))
+        ),
+        with: Base16.LowercaseDigits.self)
     }
 }

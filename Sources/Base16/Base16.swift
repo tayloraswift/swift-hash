@@ -1,64 +1,104 @@
+import BaseDigits
+
 public 
 enum Base16 
 {
     @inlinable public static 
-    func ascii(lowercasing value:UInt8) -> UInt8
+    func decode<ASCII, Bytes>(_ ascii:ASCII, to _:Bytes.Type = Bytes.self) -> Bytes
+        where   Bytes:RangeReplaceableCollection, Bytes.Element == UInt8,
+                ASCII:StringProtocol
     {
-        (value < 10 ? 0x30 : 0x61 - 10) &+ value
+        self.decode(ascii.utf8, to: Bytes.self)
     }
     @inlinable public static 
-    func ascii(uppercasing value:UInt8) -> UInt8
-    {
-        (value < 10 ? 0x30 : 0x41 - 10) &+ value
-    }
-    @inlinable public static 
-    func value(ascii digit:UInt8) -> UInt8?
-    {
-        switch digit 
-        {
-        case 0x30 ... 0x39: return digit      - 0x30
-        case 0x61 ... 0x66: return digit + 10 - 0x61
-        case 0x41 ... 0x46: return digit + 10 - 0x41
-        default:            return nil
-        }
-    }
-    
-    @inlinable public static 
-    func decode<UTF8, Bytes>(utf8:UTF8, as _:Bytes.Type = Bytes.self) -> Bytes?
-        where   UTF8:Sequence, UTF8.Element == UInt8, 
-                Bytes:RangeReplaceableCollection, Bytes.Element == UInt8
+    func decode<ASCII, Bytes>(_ ascii:ASCII, to _:Bytes.Type = Bytes.self) -> Bytes
+        where   Bytes:RangeReplaceableCollection, Bytes.Element == UInt8,
+                ASCII:Sequence, ASCII.Element == UInt8
     {
         var bytes:Bytes = .init()
-        var utf8:UTF8.Iterator = utf8.makeIterator()
-        while   let first:UInt8 = utf8.next(), 
-                let second:UInt8 = utf8.next()
+            bytes.reserveCapacity(ascii.underestimatedCount / 2)
+        var ascii:ASCII.Iterator = ascii.makeIterator()
+        while   let first:UInt8 = ascii.next(), 
+                let second:UInt8 = ascii.next()
         {
-            if  let high:UInt8 = Self.value(ascii: first),
-                let low:UInt8 = Self.value(ascii: second)
+            bytes.append(Values[first] << 4 | Values[second])
+        }
+        return bytes
+    }
+
+    @inlinable public static 
+    func encode<Bytes, Digits>(_ bytes:Bytes, with _:Digits.Type) -> String
+        where Bytes:Sequence, Bytes.Element == UInt8, Digits:BaseDigits
+    {
+        var encoded:String = ""
+            encoded.reserveCapacity(bytes.underestimatedCount * 2)
+        for byte:UInt8 in bytes
+        {
+            encoded.append(Digits[byte >> 4])
+            encoded.append(Digits[byte & 0x0f])
+        }
+        return encoded
+    }
+}
+extension Base16
+{
+    @inlinable public static 
+    func decode<ASCII>(_ ascii:ASCII,
+        into bytes:UnsafeMutableRawBufferPointer) -> Void?
+        where ASCII:Sequence, ASCII.Element == UInt8
+    {
+        var ascii:ASCII.Iterator = ascii.makeIterator()
+        for offset:Int in bytes.indices
+        {
+            if  let first:UInt8 = ascii.next(), 
+                let second:UInt8 = ascii.next()
             {
-                bytes.append(high << 4 | low)
+                bytes[offset] = Values[first] << 4 | Values[second]
             }
             else 
             {
                 return nil 
             }
         }
-        return bytes
+        return ()
     }
-    
+    @inlinable public static
+    func encode<BigEndian, Digits>(storing words:BigEndian,
+        into ascii:UnsafeMutableRawBufferPointer,
+        with _:Digits.Type)
+        where Digits:BaseDigits
+    {
+        withUnsafeBytes(of: words)
+        {
+            assert(2 * $0.count <= ascii.count)
+            
+            var offset:Int = ascii.startIndex
+            for byte:UInt8 in $0 
+            {
+                ascii[offset] = Digits[byte >> 4]
+                ascii.formIndex(after: &offset)
+                ascii[offset] = Digits[byte & 0x0f]
+                ascii.formIndex(after: &offset)
+            }
+        }
+    }
+}
+extension Base16
+{    
     #if swift(>=5.6)
     @inlinable public static 
-    func decodeBigEndian<UTF8, Words>(utf8:UTF8, as _:Words.Type = Words.self) -> Words? 
-        where UTF8:Sequence, UTF8.Element == UInt8
+    func decode<ASCII, BigEndian>(_ ascii:ASCII,
+        loading _:BigEndian.Type = BigEndian.self) -> BigEndian? 
+        where ASCII:Sequence, ASCII.Element == UInt8
     {
         withUnsafeTemporaryAllocation(
-            byteCount: MemoryLayout<Words>.size, 
-            alignment: MemoryLayout<Words>.alignment)
+            byteCount: MemoryLayout<BigEndian>.size, 
+            alignment: MemoryLayout<BigEndian>.alignment)
         {
-            var words:UnsafeMutableRawBufferPointer = $0
-            if case _? = Self.decodeBigEndian(utf8: utf8, words: &words)
+            let words:UnsafeMutableRawBufferPointer = $0
+            if case _? = Self.decode(ascii, into: words)
             {
-                return $0.load(as: Words.self)
+                return $0.load(as: BigEndian.self)
             }
             else 
             {
@@ -68,134 +108,65 @@ enum Base16
     }
     #else 
     @available(*, unavailable) public static 
-    func decodeBigEndian<UTF8, Words>(utf8:UTF8, as _:Words.Type = Words.self) -> Words? 
-        where UTF8:Sequence, UTF8.Element == UInt8
+    func decode<ASCII, BigEndian>(_ ascii:ASCII,
+        loading _:BigEndian.Type = BigEndian.self) -> BigEndian? 
+        where ASCII:Sequence, ASCII.Element == UInt8
     {
         fatalError()
     }
     #endif
-    @inlinable public static 
-    func decodeBigEndian<UTF8, Words>(utf8:UTF8, words:inout Words) -> Void? 
-        where   UTF8:Sequence, UTF8.Element == UInt8, 
-                Words:MutableCollection, Words.Element == UInt8
-    {
-        var utf8:UTF8.Iterator = utf8.makeIterator()
-        for offset:Words.Index in words.indices 
-        {
-            if  let first:UInt8 = utf8.next(), 
-                let second:UInt8 = utf8.next(), 
-                let high:UInt8 = Self.value(ascii: first),
-                let low:UInt8 = Self.value(ascii: second)
-            {
-                words[offset] = high << 4 | low
-            }
-            else 
-            {
-                return nil 
-            }
-        }
-        return ()
-    }
+
     
     @inlinable public static 
-    func encodeBigEndian<Words>(_ words:Words, as _:String.Type = String.self, 
-        by ascii:(UInt8) throws -> UInt8) rethrows -> String
+    func encode<BigEndian, Digits>(storing words:BigEndian,
+        with _:Digits.Type) -> String
+        where Digits:BaseDigits
     {
-        let bytes:Int = 2 * MemoryLayout<Words>.size
+        let bytes:Int = 2 * MemoryLayout<BigEndian>.size
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS) 
         if #available(macOS 11.0, iOS 14.0, tvOS 14.0, watchOS 14.0, *)
         {
             return try .init(unsafeUninitializedCapacity: bytes)
             {
-                var utf8:UnsafeMutableBufferPointer<UInt8> = $0
-                try Self.encodeBigEndian(words, utf8: &utf8, by: ascii)
+                Self.encode(storing: words,
+                    into: UnsafeMutableRawBufferPointer.init($0),
+                    with: Digits.self)
                 return bytes
             }
         }
         else 
         {
-            return .init(decoding: try Self.encodeBigEndian(words, as: [UInt8].self, by: ascii), 
+            return .init(
+                decoding: try Self.encode(storing: words, to: [UInt8].self, with: Digits.self), 
                 as: Unicode.UTF8.self)
         }
         #elseif swift(>=5.4)
-        return try .init(unsafeUninitializedCapacity: bytes)
+        return .init(unsafeUninitializedCapacity: bytes)
         {
-            var utf8:UnsafeMutableBufferPointer<UInt8> = $0
-            try Self.encodeBigEndian(words, utf8: &utf8, by: ascii)
+            Self.encode(storing: words,
+                into: UnsafeMutableRawBufferPointer.init($0),
+                with: Digits.self)
             return bytes
         }
         #else 
-        return .init(decoding: try Self.encodeBigEndian(words, as: [UInt8].self, by: ascii), 
+        return .init(
+            decoding: try Self.encode(storing: words, to: [UInt8].self, with: Digits.self), 
             as: Unicode.UTF8.self)
         #endif 
     }
     
     @inlinable public static 
-    func encodeBigEndian<Words>(lowercasing words:Words, as _:String.Type = String.self) 
-        -> String
+    func encode<BigEndian, Digits>(storing words:BigEndian, to _:[UInt8].Type,
+        with _:Digits.Type) -> [UInt8]
+        where Digits:BaseDigits
     {
-        Self.encodeBigEndian(words, by: Self.ascii(lowercasing:))
-    }
-    @inlinable public static 
-    func encodeBigEndian<Words>(uppercasing words:Words, as _:String.Type = String.self) 
-        -> String
-    {
-        Self.encodeBigEndian(words, by: Self.ascii(uppercasing:))
-    }
-    
-    @inlinable public static 
-    func encodeBigEndian<Words>(lowercasing words:Words, as _:[UInt8].Type = [UInt8].self) 
-        -> [UInt8]
-    {
-        Self.encodeBigEndian(words, by: Self.ascii(lowercasing:))
-    }
-    @inlinable public static 
-    func encodeBigEndian<Words>(uppercasing words:Words, as _:[UInt8].Type = [UInt8].self) 
-        -> [UInt8]
-    {
-        Self.encodeBigEndian(words, by: Self.ascii(uppercasing:))
-    }
-    @inlinable public static 
-    func encodeBigEndian<Words>(_ words:Words, as _:[UInt8].Type = [UInt8].self, 
-        by ascii:(UInt8) throws -> UInt8) rethrows -> [UInt8]
-    {
-        let bytes:Int = 2 * MemoryLayout<Words>.size
-        return try .init(unsafeUninitializedCapacity: bytes)
+        let bytes:Int = 2 * MemoryLayout<BigEndian>.size
+        return .init(unsafeUninitializedCapacity: bytes)
         {
-            try Self.encodeBigEndian(words, utf8: &$0, by: ascii)
+            Self.encode(storing: words,
+                into: UnsafeMutableRawBufferPointer.init($0),
+                with: Digits.self)
             $1 = bytes
-        }
-    }
-    
-    @inlinable public static 
-    func encodeBigEndian<UTF8, Words>(lowercasing words:Words, utf8:inout UTF8)
-        where UTF8:MutableCollection, UTF8.Element == UInt8
-    {
-        Self.encodeBigEndian(words, utf8: &utf8, by: Self.ascii(lowercasing:))
-    }
-    @inlinable public static 
-    func encodeBigEndian<UTF8, Words>(uppercasing words:Words, utf8:inout UTF8)
-        where UTF8:MutableCollection, UTF8.Element == UInt8
-    {
-        Self.encodeBigEndian(words, utf8: &utf8, by: Self.ascii(uppercasing:))
-    }
-    @inlinable public static 
-    func encodeBigEndian<UTF8, Words>(_ words:Words, utf8:inout UTF8, 
-        by ascii:(UInt8) throws -> UInt8) rethrows
-        where UTF8:MutableCollection, UTF8.Element == UInt8
-    {
-        try withUnsafeBytes(of: words)
-        {
-            assert(2 * $0.count <= utf8.count)
-            
-            var offset:UTF8.Index = utf8.startIndex
-            for byte:UInt8 in $0 
-            {
-                utf8[offset] = try ascii(byte >> 4)
-                utf8.formIndex(after: &offset)
-                utf8[offset] = try ascii(byte & 0x0f)
-                utf8.formIndex(after: &offset)
-            }
         }
     }
 }
