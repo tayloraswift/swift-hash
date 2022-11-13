@@ -1,11 +1,12 @@
 import Base16
+import MessageAuthentication
 
 #if swift(>=5.5)
 extension SHA256:Sendable {}
 #endif 
 
 @frozen public
-struct SHA256:RandomAccessCollection, Hashable
+struct SHA256
 {
     public 
     typealias Words = (UInt32, UInt32, UInt32, UInt32, UInt32, UInt32, UInt32, UInt32)
@@ -33,54 +34,6 @@ struct SHA256:RandomAccessCollection, Hashable
     
     public
     var words:Words
-    
-    @inlinable public 
-    var startIndex:Int 
-    {
-        0
-    }
-    @inlinable public 
-    var endIndex:Int 
-    {
-        32
-    }
-    @inlinable public 
-    subscript(index:Int) -> UInt8 
-    {
-        withUnsafePointer(to: self.words)
-        {
-            $0.withMemoryRebound(to: UInt32.self, capacity: 8)
-            {
-                // big-endian 
-                UInt8.init(($0[index >> 2] << ((index & 3) << 3)) >> 24)
-            }
-        }
-    }
-    
-    @inlinable public static 
-    func == (lhs:Self, rhs:Self) -> Bool 
-    {
-        lhs.words.0 == rhs.words.0 &&
-        lhs.words.1 == rhs.words.1 &&
-        lhs.words.2 == rhs.words.2 &&
-        lhs.words.3 == rhs.words.3 &&
-        lhs.words.4 == rhs.words.4 &&
-        lhs.words.5 == rhs.words.5 &&
-        lhs.words.6 == rhs.words.6 &&
-        lhs.words.7 == rhs.words.7
-    }
-    @inlinable public 
-    func hash(into hasher:inout Hasher)
-    {
-        self.words.0.hash(into: &hasher)
-        self.words.1.hash(into: &hasher)
-        self.words.2.hash(into: &hasher)
-        self.words.3.hash(into: &hasher)
-        self.words.4.hash(into: &hasher)
-        self.words.5.hash(into: &hasher)
-        self.words.6.hash(into: &hasher)
-        self.words.7.hash(into: &hasher)
-    }
     
     @inlinable public 
     init(words:Words = 
@@ -225,32 +178,59 @@ struct SHA256:RandomAccessCollection, Hashable
     }
 }
 
-extension SHA256 
+extension SHA256:Equatable
 {
     @inlinable public static 
-    func hmac<Message, Key>(_ message:Message, key:Key) -> Self
-        where   Message:Sequence, Message.Element == UInt8,
-                Key:Collection, Key.Element == UInt8 
+    func == (lhs:Self, rhs:Self) -> Bool 
     {
-        let normalized:[UInt8]
-        if      key.count > 64 
+        lhs.words.0 == rhs.words.0 &&
+        lhs.words.1 == rhs.words.1 &&
+        lhs.words.2 == rhs.words.2 &&
+        lhs.words.3 == rhs.words.3 &&
+        lhs.words.4 == rhs.words.4 &&
+        lhs.words.5 == rhs.words.5 &&
+        lhs.words.6 == rhs.words.6 &&
+        lhs.words.7 == rhs.words.7
+    }
+}
+extension SHA256:Hashable
+{
+    @inlinable public 
+    func hash(into hasher:inout Hasher)
+    {
+        self.words.0.hash(into: &hasher)
+        self.words.1.hash(into: &hasher)
+        self.words.2.hash(into: &hasher)
+        self.words.3.hash(into: &hasher)
+        self.words.4.hash(into: &hasher)
+        self.words.5.hash(into: &hasher)
+        self.words.6.hash(into: &hasher)
+        self.words.7.hash(into: &hasher)
+    }
+}
+extension SHA256:MessageAuthenticationHash
+{
+    public static
+    let stride:Int = 64
+    public static
+    let count:Int = 32
+
+    @inlinable public
+    var startIndex:Int 
+    {
+        0
+    }
+    @inlinable public 
+    subscript(index:Int) -> UInt8 
+    {
+        withUnsafePointer(to: self.words)
         {
-            normalized = [UInt8].init(Self.init(hashing: key)) + 
-                repeatElement(0, count: 32)
+            $0.withMemoryRebound(to: UInt32.self, capacity: 8)
+            {
+                // big-endian 
+                UInt8.init(($0[index >> 2] << ((index & 3) << 3)) >> 24)
+            }
         }
-        else if key.count < 64 
-        {
-            normalized = [UInt8].init(key) + 
-                repeatElement(0, count: 64 - key.count)
-        }
-        else 
-        {
-            normalized = [UInt8].init(key)
-        }
-        
-        let inner:[UInt8] = normalized.map { $0 ^ 0x36 },
-            outer:[UInt8] = normalized.map { $0 ^ 0x5c }
-        return .init(hashing: outer + Self.init(hashing: inner + message))
     }
 }
 
