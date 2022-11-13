@@ -36,12 +36,13 @@ let package:Package = .init(
     name: "swift-hash",
     products:
     [
-        .library(name: "Base16",  targets: ["Base16"]),
-        .library(name: "Base64",  targets: ["Base64"]),
-        .library(name: "SHA2", targets: ["SHA2"]),
-        .library(name: "CRC", targets: ["CRC"]),
+        .library(name: "Base16",                targets: ["Base16"]),
+        .library(name: "Base64",                targets: ["Base64"]),
+        .library(name: "CRC",                   targets: ["CRC"]),
+        .library(name: "MessageAuthentication", targets: ["MessageAuthentication"]),
+        .library(name: "SHA2",                  targets: ["SHA2"]),
 
-        .library(name: "Testing", targets: ["Testing"]),
+        .library(name: "Testing",               targets: ["Testing"]),
     ],
     dependencies: 
     [
@@ -62,16 +63,19 @@ let package:Package = .init(
                 .target(name: "BaseDigits"),
             ]),
 
-        .target(name: "SHA2", 
+        .target(name: "CRC", 
             dependencies: 
             [
                 .target(name: "Base16"),
             ]),
         
-        .target(name: "CRC", 
+        .target(name: "MessageAuthentication"),
+
+        .target(name: "SHA2", 
             dependencies: 
             [
                 .target(name: "Base16"),
+                .target(name: "MessageAuthentication"),
             ]),
         
         .target(name: "Testing"),

@@ -1,6 +1,6 @@
 <div align="center">
   
-***`hash`***<br>`0.3.0`
+***`hash`***<br>`0.4.0`
   
 [![ci status](https://github.com/kelvin13/swift-hash/actions/workflows/build.yml/badge.svg)](https://github.com/kelvin13/swift-hash/actions/workflows/build.yml)
 [![ci status](https://github.com/kelvin13/swift-hash/actions/workflows/build-devices.yml/badge.svg)](https://github.com/kelvin13/swift-hash/actions/workflows/build-devices.yml)
@@ -30,6 +30,10 @@ The package vends the following library products:
 
     Implements [CRC-32](https://en.wikipedia.org/wiki/Cyclic_redundancy_check) checksums.
 
+1.  [`MessageAuthentication`](Sources/MessageAuthentication)
+
+    Implements [hash-based message authentication codes](https://en.wikipedia.org/wiki/HMAC) (HMACs) through protocols that types in the other modules conform to.
+
 1.  [`SHA2`](Sources/SHA2)
 
-    Implements the [SHA-256](https://en.wikipedia.org/wiki/SHA-2) and HMAC-SHA-256 hashing functions.
+    Implements the [SHA-256](https://en.wikipedia.org/wiki/SHA-2) hashing function.
