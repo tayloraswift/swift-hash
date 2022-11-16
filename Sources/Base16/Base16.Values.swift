@@ -1,21 +1,38 @@
 extension Base16
 {
+    /// An abstraction over text input, which discards characters that are not
+    /// valid base-16 digits.
     public
-    enum Values
+    struct Values<ASCII> where ASCII:Sequence, ASCII.Element == UInt8
     {
+        public
+        var iterator:ASCII.Iterator
+
+        @inlinable public
+        init(_ ascii:ASCII)
+        {
+            self.iterator = ascii.makeIterator()
+        }
     }
 }
-extension Base16.Values
+extension Base16.Values:Sequence, IteratorProtocol
 {
-    @inlinable public static 
-    subscript(digit:UInt8) -> UInt8
+    public
+    typealias Iterator = Self
+
+    @inlinable public mutating
+    func next() -> UInt8?
     {
-        switch digit 
+        while let digit:UInt8 = self.iterator.next()
         {
-        case 0x30 ... 0x39: return digit      - 0x30
-        case 0x61 ... 0x66: return digit + 10 - 0x61
-        case 0x41 ... 0x46: return digit + 10 - 0x41
-        default:            return 0
+            switch digit 
+            {
+            case 0x30 ... 0x39: return digit      - 0x30
+            case 0x61 ... 0x66: return digit + 10 - 0x61
+            case 0x41 ... 0x46: return digit + 10 - 0x41
+            default:            continue
+            }
         }
+        return nil
     }
 }

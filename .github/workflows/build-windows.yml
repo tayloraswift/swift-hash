@@ -29,6 +29,6 @@ jobs:
             -   name: test 
                 run: |
                     swift --version
-                    swift run Base64Tests
-                    swift run CRCTests
-                    swift run SHA2Tests
+                    swift run -c release Base64Tests
+                    swift run -c release CRCTests
+                    swift run -c release SHA2Tests

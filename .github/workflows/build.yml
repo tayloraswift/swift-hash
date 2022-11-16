@@ -50,9 +50,9 @@ jobs:
                     $SWIFT_TOOLCHAIN_DIRECTORY/usr/bin/swift build
             -   name: test
                 run: |
-                    $SWIFT_TOOLCHAIN_DIRECTORY/usr/bin/swift run Base64Tests
-                    $SWIFT_TOOLCHAIN_DIRECTORY/usr/bin/swift run CRCTests
-                    $SWIFT_TOOLCHAIN_DIRECTORY/usr/bin/swift run SHA2Tests
+                    $SWIFT_TOOLCHAIN_DIRECTORY/usr/bin/swift run -c release Base64Tests
+                    $SWIFT_TOOLCHAIN_DIRECTORY/usr/bin/swift run -c release CRCTests
+                    $SWIFT_TOOLCHAIN_DIRECTORY/usr/bin/swift run -c release SHA2Tests
     
     macos:
         runs-on: ${{ matrix.os }}
@@ -71,9 +71,9 @@ jobs:
                     swift build
             -   name: test
                 run: |
-                    swift run Base64Tests
-                    swift run CRCTests
-                    swift run SHA2Tests
+                    swift run -c release Base64Tests
+                    swift run -c release CRCTests
+                    swift run -c release SHA2Tests
     
     linux:
         runs-on: ${{ matrix.os.runner }}
@@ -147,6 +147,6 @@ jobs:
                     swift build 
             -   name: test
                 run: |
-                    swift run Base64Tests
-                    swift run CRCTests
-                    swift run SHA2Tests
+                    swift run -c release Base64Tests
+                    swift run -c release CRCTests
+                    swift run -c release SHA2Tests

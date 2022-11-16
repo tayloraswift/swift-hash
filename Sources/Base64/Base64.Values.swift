@@ -1,26 +1,50 @@
-extension Base64
+extension Base64 
 {
-    public
-    enum Values
+    /// An abstraction over text input, which discards characters that are not
+    /// valid base-64 digits.
+    ///
+    /// Iteration over an instance of this type will halt upon encountering the
+    /// first [`'='`]() padding character, even if the underlying sequence contains
+    /// more characters.
+    @frozen public
+    struct Values<ASCII> where ASCII:Sequence, ASCII.Element == UInt8
     {
-        public static
-        let table:[UInt8] =
-        [
-            //                                     0x2B:
-                                                        62, 00, 00, 00, 63,
-            52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 00, 00, 00, 00, 00, 00,
-            00, 00, 01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13, 14,
-            15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 00, 00, 00, 00, 00,
-            00, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
-            41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51,
-        ]
+        public
+        var iterator:ASCII.Iterator
+
+        @inlinable public
+        init(_ ascii:ASCII)
+        {
+            self.iterator = ascii.makeIterator()
+        }
     }
 }
-extension Base64.Values
+extension Base64.Values:Sequence, IteratorProtocol
 {
-    @inlinable public static 
-    subscript(digit:UInt8) -> UInt8
+    public
+    typealias Iterator = Self
+
+    @inlinable public mutating
+    func next() -> UInt8?
     {
-        0x2B ... 0x7A ~= digit ? Self.table[Int.init(digit - 0x2B)] : 0
+        while let digit:UInt8 = self.iterator.next(), digit != 0x3D // '='
+        {
+            switch digit
+            {
+            case 0x41 ... 0x5a: // A-Z
+                return digit - 0x41
+            case 0x61 ... 0x7a: // a-z
+                return digit - 0x61 + 26
+            case 0x30 ... 0x39: // 0-9
+                return digit - 0x30 + 52
+            case 0x2b: // +
+                return 62
+            case 0x2f: // /
+                return 63
+            default:
+                continue
+            }
+        }
+        return nil
     }
 }

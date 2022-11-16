@@ -10,8 +10,13 @@ enum Base16
     /// input string.
     ///
     /// Characters (including UTF-8 continuation bytes) that are not base-16 digits
-    /// will be interpreted as zeros. If the string does not contain an even number
-    /// of digits, the trailing digit will be ignored.
+    /// will be skipped. If the string does not contain an even number of digits,
+    /// the trailing digit will be ignored.
+    ///
+    /// >   Warning:
+    ///     This function uses the size of the input string to provide a capacity hint
+    ///     for its output, and may over-allocate storage if the input contains many
+    ///     non-digit characters.
     @inlinable public static 
     func decode<ASCII, Bytes>(_ ascii:ASCII, to _:Bytes.Type = Bytes.self) -> Bytes
         where   Bytes:RangeReplaceableCollection, Bytes.Element == UInt8,
@@ -24,8 +29,13 @@ enum Base16
     /// hexadecimal digits in the input.
     ///
     /// Characters (including UTF-8 continuation bytes) that are not base-16 digits
-    /// will be interpreted as zeros. If the input does not yield an even number of
-    /// digits, the trailing digit will be ignored.
+    /// will be skipped. If the input does not yield an even number of digits, the
+    /// trailing digit will be ignored.
+    ///
+    /// >   Warning:
+    ///     This function uses the size of the input string to provide a capacity hint
+    ///     for its output, and may over-allocate storage if the input contains many
+    ///     non-digit characters.
     @inlinable public static 
     func decode<ASCII, Bytes>(_ ascii:ASCII, to _:Bytes.Type = Bytes.self) -> Bytes
         where   Bytes:RangeReplaceableCollection, Bytes.Element == UInt8,
@@ -33,11 +43,11 @@ enum Base16
     {
         var bytes:Bytes = .init()
             bytes.reserveCapacity(ascii.underestimatedCount / 2)
-        var ascii:ASCII.Iterator = ascii.makeIterator()
-        while   let first:UInt8 = ascii.next(), 
-                let second:UInt8 = ascii.next()
+        var values:Values<ASCII> = .init(ascii)
+        while   let high:UInt8 = values.next(), 
+                let low:UInt8 = values.next()
         {
-            bytes.append(Values[first] << 4 | Values[second])
+            bytes.append(high << 4 | low)
         }
         return bytes
     }
@@ -59,23 +69,23 @@ enum Base16
 extension Base16
 {
     /// Decodes an ASCII-encoded base-16 string into a pre-allocated buffer,
-    /// returning [`nil`]() if the input did not yield enough bytes to fill
+    /// returning [`nil`]() if the input did not yield enough digits to fill
     /// the buffer completely.
     ///
     /// Characters (including UTF-8 continuation bytes) that are not base-16 digits
-    /// will be interpreted as zeros.
+    /// will be skipped.
     @inlinable public static 
     func decode<ASCII>(_ ascii:ASCII,
         into bytes:UnsafeMutableRawBufferPointer) -> Void?
         where ASCII:Sequence, ASCII.Element == UInt8
     {
-        var ascii:ASCII.Iterator = ascii.makeIterator()
+        var values:Values<ASCII> = .init(ascii)
         for offset:Int in bytes.indices
         {
-            if  let first:UInt8 = ascii.next(), 
-                let second:UInt8 = ascii.next()
+            if  let high:UInt8 = values.next(), 
+                let low:UInt8 = values.next()
             {
-                bytes[offset] = Values[first] << 4 | Values[second]
+                bytes[offset] = high << 4 | low
             }
             else 
             {
