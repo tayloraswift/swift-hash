@@ -1,6 +1,6 @@
 <div align="center">
   
-***`hash`***<br>`0.4.0`
+***`hash`***<br>`0.4.1`
   
 [![ci status](https://github.com/kelvin13/swift-hash/actions/workflows/build.yml/badge.svg)](https://github.com/kelvin13/swift-hash/actions/workflows/build.yml)
 [![ci status](https://github.com/kelvin13/swift-hash/actions/workflows/build-devices.yml/badge.svg)](https://github.com/kelvin13/swift-hash/actions/workflows/build-devices.yml)
