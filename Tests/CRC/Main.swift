@@ -2,13 +2,11 @@ import CRC
 import Testing
 
 @main 
-enum Main
+enum Main:SynchronousTests
 {
     static
-    func main() throws
+    func run(tests:inout Tests)
     {
-        var tests:UnitTests = .init()
-
         // https://www.rfc-editor.org/rfc/rfc3720#appendix-B.4
         tests.test(name: "basic", message: "123456789", expected: 0xcb_f4_39_26)
 
@@ -220,7 +218,5 @@ enum Main
             
             """,
             expected: 0xaf_fb_88_44)
-        
-        try tests.summarize()
     }
 }

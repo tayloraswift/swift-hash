@@ -1,5 +1,5 @@
 public
-struct UnitTests
+struct Tests
 {
     public private(set)
     var passed:Int
@@ -23,7 +23,7 @@ struct UnitTests
         self.scope = []
     }
 }
-extension UnitTests
+extension Tests
 {
     public
     struct Failures:Error
@@ -56,20 +56,12 @@ extension UnitTests
         }
     }
 }
-extension UnitTests
+extension Tests
 {
     private
-    func scope(name:String?) -> String
+    func scope(name:String) -> String
     {
-        if let name:String = name
-        {
-            return self.scope.isEmpty ? name :
-                "\(self.scope.joined(separator: ".")).\(name)"
-        }
-        else
-        {
-            return self.scope.joined(separator: ".")
-        }
+        self.scope.isEmpty ? name : "\(self.scope.joined(separator: ".")).\(name)"
     }
     @discardableResult
     public mutating
@@ -123,74 +115,12 @@ extension UnitTests
         throw Failures.init()
     }
 }
-extension UnitTests
-{
-    public mutating 
-    func assert(_ bool:Bool, name:String? = nil,
-        function:String = #function,
-        file:String = #file,
-        line:Int = #line,
-        column:Int = #column)  
-    {
-        if  bool
-        {
-            self.passed += 1
-        }
-        else
-        {
-            self.failed.append(Failure<Assert.True>.init(.init(),
-                location: .init(function: function, file: file, line: line, column: column),
-                scope: self.scope(name: name)))
-        }
-    }
 
-    public mutating 
-    func assert<T>(_ failure:Assert.Equivalence<T>?, name:String? = nil,
-        function:String = #function, 
-        file:String = #file, 
-        line:Int = #line, 
-        column:Int = #column) 
-    {
-        if let failure:Assert.Equivalence<T> = failure
-        {
-            self.failed.append(Failure<Assert.Equivalence<T>>.init(failure,
-                location: .init(function: function, file: file, line: line, column: column),
-                scope: self.scope(name: name)))
-        }
-        else 
-        {
-            self.passed += 1
-        }
-    }
-}
-extension UnitTests
-{
-    public mutating
-    func unwrap<Wrapped>(_ optional:Wrapped?, name:String? = nil,
-        file:String = #file, 
-        function:String = #function, 
-        line:Int = #line, 
-        column:Int = #column) -> Wrapped?
-    {
-        if let wrapped:Wrapped = optional
-        {
-            return wrapped 
-        }
-        else 
-        {
-            let error:Assert.OptionalUnwrap<Wrapped> = .init()
-            self.failed.append(Failure<Assert.OptionalUnwrap<Wrapped>>.init(error,
-                location: .init(function: function, file: file, line: line, column: column),
-                scope: self.scope(name: name)))
-            return nil
-        }
-    }
-}
-extension UnitTests
+extension Tests
 {
     @discardableResult
     public mutating 
-    func `do`<T>(name:String? = nil,
+    func `do`<T>(name:String,
         function:String = #function, 
         file:String = #file, 
         line:Int = #line, 
@@ -212,7 +142,7 @@ extension UnitTests
         }
     }
     public mutating 
-    func `do`<Thrown>(expecting expected:Thrown, name:String? = nil,
+    func `do`<Thrown>(name:String, expecting expected:Thrown,
         function:String = #function, 
         file:String = #file, 
         line:Int = #line, 
@@ -244,11 +174,11 @@ extension UnitTests
 
 #if swift(>=5.5)
 @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
-extension UnitTests
+extension Tests
 {
     @discardableResult
     public mutating 
-    func `do`<T>(name:String? = nil,
+    func `do`<T>(name:String,
         function:String = #function, 
         file:String = #file, 
         line:Int = #line, 
@@ -270,7 +200,7 @@ extension UnitTests
         }
     }
     public mutating 
-    func `do`<Thrown>(expecting expected:Thrown, name:String? = nil,
+    func `do`<Thrown>(name:String, expecting expected:Thrown,
         function:String = #function, 
         file:String = #file, 
         line:Int = #line, 
@@ -300,3 +230,67 @@ extension UnitTests
     }
 }
 #endif
+
+extension Tests
+{
+    public mutating 
+    func assert(_ bool:Bool, name:String,
+        function:String = #function,
+        file:String = #file,
+        line:Int = #line,
+        column:Int = #column)  
+    {
+        if  bool
+        {
+            self.passed += 1
+        }
+        else
+        {
+            self.failed.append(Failure<Assert.True>.init(.init(),
+                location: .init(function: function, file: file, line: line, column: column),
+                scope: self.scope(name: name)))
+        }
+    }
+
+    public mutating 
+    func assert<T>(_ failure:Assert.Equivalence<T>?, name:String,
+        function:String = #function, 
+        file:String = #file, 
+        line:Int = #line, 
+        column:Int = #column) 
+    {
+        if let failure:Assert.Equivalence<T> = failure
+        {
+            self.failed.append(Failure<Assert.Equivalence<T>>.init(failure,
+                location: .init(function: function, file: file, line: line, column: column),
+                scope: self.scope(name: name)))
+        }
+        else 
+        {
+            self.passed += 1
+        }
+    }
+}
+extension Tests
+{
+    public mutating
+    func unwrap<Wrapped>(_ optional:Wrapped?, name:String,
+        file:String = #file, 
+        function:String = #function, 
+        line:Int = #line, 
+        column:Int = #column) -> Wrapped?
+    {
+        if let wrapped:Wrapped = optional
+        {
+            return wrapped 
+        }
+        else 
+        {
+            let error:Assert.OptionalUnwrap<Wrapped> = .init()
+            self.failed.append(Failure<Assert.OptionalUnwrap<Wrapped>>.init(error,
+                location: .init(function: function, file: file, line: line, column: column),
+                scope: self.scope(name: name)))
+            return nil
+        }
+    }
+}

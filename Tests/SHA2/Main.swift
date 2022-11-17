@@ -1,13 +1,11 @@
 import Testing
 
 @main
-enum Main
+enum Main:SynchronousTests
 {
     static
-    func main() throws
+    func run(tests:inout Tests)
     {
-        var tests:UnitTests = .init()
-
         // https://datatracker.ietf.org/doc/html/rfc4231
         tests.group("hmac-sha-256")
         {
@@ -225,7 +223,5 @@ enum Main
                     0x3c, 0x69, 0x62, 0x26, 0x65, 0x0a, 0x86, 0x87,
                 ])
         }
-
-        try tests.summarize()
     }
 }

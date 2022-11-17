@@ -1,7 +1,7 @@
 import CRC
 import Testing
 
-extension UnitTests
+extension Tests
 {
     mutating
     func test(name:String, message:String, expected:CRC32)

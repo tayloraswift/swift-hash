@@ -23,11 +23,25 @@ extension Assert
         {
             if let thrown:Error = self.thrown
             {
-                return "expected thrown error '\(self.expected)', but caught '\(thrown)'"
+                return 
+                    """
+                    expected thrown error
+                    ---------------------
+                    \(self.expected)
+                    ---------------------
+                    but caught
+                    ---------------------
+                    \(thrown)
+                    """
             }
             else
             {
-                return "expected thrown error '\(self.expected)'"
+                return
+                    """
+                    expected thrown error
+                    ---------------------
+                    \(self.expected)
+                    """
             }
         }
 
@@ -50,11 +64,25 @@ extension Assert
         {
             if let thrown:any Error = self.thrown
             {
-                return "expected thrown error '\(self.expected)', but caught '\(thrown)'"
+                return 
+                    """
+                    expected thrown error
+                    ---------------------
+                    \(self.expected)
+                    ---------------------
+                    but caught
+                    ---------------------
+                    \(thrown)
+                    """
             }
             else
             {
-                return "expected thrown error '\(self.expected)'"
+                return
+                    """
+                    expected thrown error
+                    ---------------------
+                    \(self.expected)
+                    """
             }
         }
 

@@ -1,13 +1,11 @@
 import Testing
 
 @main 
-enum Main
+enum Main:SynchronousTests
 {
     static
-    func main() throws
+    func run(tests:inout Tests)
     {
-        var tests:UnitTests = .init()
-
         tests.group("binary")
         {
             $0.test(name: "all",
@@ -112,6 +110,5 @@ enum Main
                 canonical: "bGlnaHQgdw==",
                 expected: "light w")
         }
-        try tests.summarize()
     }
 }
