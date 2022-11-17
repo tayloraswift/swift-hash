@@ -6,6 +6,7 @@ protocol AsynchronousTests
     static
     func run(tests:inout Tests) async
 }
+@available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
 extension AsynchronousTests
 {
     public static

@@ -172,7 +172,7 @@ extension Base16
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS) 
         if #available(macOS 11.0, iOS 14.0, tvOS 14.0, watchOS 14.0, *)
         {
-            return try .init(unsafeUninitializedCapacity: bytes)
+            return .init(unsafeUninitializedCapacity: bytes)
             {
                 Self.encode(storing: words,
                     into: UnsafeMutableRawBufferPointer.init($0),
