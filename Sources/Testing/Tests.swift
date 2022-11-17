@@ -37,10 +37,10 @@ extension Tests
         public
         let assertion:Assertion
         public
-        let scope:String
+        let scope:[String]
 
         public
-        init(_ assertion:Assertion, location:SourceLocation, scope:String)
+        init(_ assertion:Assertion, location:SourceLocation, scope:[String])
         {
             self.assertion = assertion
             self.location = location
@@ -50,7 +50,7 @@ extension Tests
         var description:String
         {
             """
-            \(self.scope): \(self.assertion)
+            \(self.scope.joined(separator: ".")): \(self.assertion)
             note: at \(self.location)
             """
         }
@@ -58,11 +58,6 @@ extension Tests
 }
 extension Tests
 {
-    private
-    func scope(name:String) -> String
-    {
-        self.scope.isEmpty ? name : "\(self.scope.joined(separator: ".")).\(name)"
-    }
     @discardableResult
     public mutating
     func group<T>(_ name:String, running run:(inout Self) -> T) -> T
@@ -127,18 +122,21 @@ extension Tests
         column:Int = #column,
         body:(inout Self) throws -> T) -> T?
     {
-        do
+        self.group(name)
         {
-            let returned:T = try body(&self)
-            self.passed += 1
-            return returned
-        }
-        catch let error
-        {
-            self.failed.append(Failure<Assert.Success>.init(.init(caught: error),
-                location: .init(function: function, file: file, line: line, column: column),
-                scope: self.scope(name: name)))
-            return nil
+            do
+            {
+                let returned:T = try body(&$0)
+                $0.passed += 1
+                return returned
+            }
+            catch let error
+            {
+                $0.failed.append(Failure<Assert.Success>.init(.init(caught: error),
+                    location: .init(function: function, file: file, line: line, column: column),
+                    scope: $0.scope))
+                return nil
+            }
         }
     }
     public mutating 
@@ -150,25 +148,28 @@ extension Tests
         body:(inout Self) throws -> ())
         where Thrown:Error & Equatable
     {
-        let error:Assert.ThrownError<Thrown>
-        do
+        self.group(name)
         {
-            try body(&self)
-            error = .init(thrown: nil, expected: expected)
-        }
-        catch expected as Thrown
-        {
-            self.passed += 1
-            return
-        }
-        catch let other
-        {
-            error = .init(thrown: other, expected: expected)
-        }
+            let error:Assert.ThrownError<Thrown>
+            do
+            {
+                try body(&$0)
+                error = .init(thrown: nil, expected: expected)
+            }
+            catch expected as Thrown
+            {
+                $0.passed += 1
+                return
+            }
+            catch let other
+            {
+                error = .init(thrown: other, expected: expected)
+            }
 
-        self.failed.append(Failure<Assert.ThrownError<Thrown>>.init(error,
-            location: .init(function: function, file: file, line: line, column: column),
-            scope: self.scope(name: name)))
+            $0.failed.append(Failure<Assert.ThrownError<Thrown>>.init(error,
+                location: .init(function: function, file: file, line: line, column: column),
+                scope: $0.scope))
+        }
     }
 }
 
@@ -185,18 +186,21 @@ extension Tests
         column:Int = #column,
         body:@Sendable (inout Self) async throws -> T) async -> T?
     {
-        do
+        await self.group(name)
         {
-            let returned:T = try await body(&self)
-            self.passed += 1
-            return returned
-        }
-        catch let error
-        {
-            self.failed.append(Failure<Assert.Success>.init(.init(caught: error),
-                location: .init(function: function, file: file, line: line, column: column),
-                scope: self.scope(name: name)))
-            return nil
+            do
+            {
+                let returned:T = try await body(&$0)
+                $0.passed += 1
+                return returned
+            }
+            catch let error
+            {
+                $0.failed.append(Failure<Assert.Success>.init(.init(caught: error),
+                    location: .init(function: function, file: file, line: line, column: column),
+                    scope: $0.scope))
+                return nil
+            }
         }
     }
     public mutating 
@@ -208,25 +212,28 @@ extension Tests
         body:@Sendable (inout Self) async throws -> ()) async
         where Thrown:Error & Equatable
     {
-        let error:Assert.ThrownError<Thrown>
-        do
+        await self.group(name)
         {
-            try await body(&self)
-            error = .init(thrown: nil, expected: expected)
-        }
-        catch expected as Thrown
-        {
-            self.passed += 1
-            return
-        }
-        catch let other
-        {
-            error = .init(thrown: other, expected: expected)
-        }
+            let error:Assert.ThrownError<Thrown>
+            do
+            {
+                try await body(&$0)
+                error = .init(thrown: nil, expected: expected)
+            }
+            catch expected as Thrown
+            {
+                $0.passed += 1
+                return
+            }
+            catch let other
+            {
+                error = .init(thrown: other, expected: expected)
+            }
 
-        self.failed.append(Failure<Assert.ThrownError<Thrown>>.init(error,
-            location: .init(function: function, file: file, line: line, column: column),
-            scope: self.scope(name: name)))
+            $0.failed.append(Failure<Assert.ThrownError<Thrown>>.init(error,
+                location: .init(function: function, file: file, line: line, column: column),
+                scope: $0.scope))
+        }
     }
 }
 #endif
@@ -248,7 +255,7 @@ extension Tests
         {
             self.failed.append(Failure<Assert.True>.init(.init(),
                 location: .init(function: function, file: file, line: line, column: column),
-                scope: self.scope(name: name)))
+                scope: self.scope + [name]))
         }
     }
 
@@ -263,7 +270,7 @@ extension Tests
         {
             self.failed.append(Failure<Assert.Equivalence<T>>.init(failure,
                 location: .init(function: function, file: file, line: line, column: column),
-                scope: self.scope(name: name)))
+                scope: self.scope + [name]))
         }
         else 
         {
@@ -289,7 +296,7 @@ extension Tests
             let error:Assert.OptionalUnwrap<Wrapped> = .init()
             self.failed.append(Failure<Assert.OptionalUnwrap<Wrapped>>.init(error,
                 location: .init(function: function, file: file, line: line, column: column),
-                scope: self.scope(name: name)))
+                scope: self.scope + [name]))
             return nil
         }
     }
