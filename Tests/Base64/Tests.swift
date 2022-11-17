@@ -1,7 +1,7 @@
 import Base64
 import Testing
 
-extension UnitTests
+extension Tests
 {
     mutating
     func test(name:String,

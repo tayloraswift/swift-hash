@@ -2,7 +2,7 @@ import Base16
 import SHA2
 import Testing
 
-extension UnitTests
+extension Tests
 {
     mutating
     func test(name:String, key:String, message:String, hmac256 expected:SHA256)
