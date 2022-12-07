@@ -3,15 +3,8 @@ struct Tests
 {
     public
     var passed:Int
-
-    #if swift(<5.7)
     public
-    var failed:[Error]
-    #else
-    public
-    var failed:[any Error]
-    #endif
-
+    var failed:[TestFailure]
     public private(set)
     var scope:[String]
 
@@ -63,17 +56,10 @@ extension Tests
         }
         print("failed: \(self.failed.count) test(s)")
 
-        #if swift(<5.7)
-        for (ordinal, failure):(Int, Error) in self.failed.enumerated()
+        for (ordinal, failure):(Int, TestFailure) in self.failed.enumerated()
         {
             print("\(ordinal). \(failure)")
         }
-        #else
-        for (ordinal, failure):(Int, any Error) in self.failed.enumerated()
-        {
-            print("\(ordinal). \(failure)")
-        }
-        #endif
 
         throw TestFailures.init()
     }
@@ -100,7 +86,7 @@ extension Tests
             }
             catch let error
             {
-                $0.failed.append(TestFailure<any Error>.init(error,
+                $0.failed.append(.init(error,
                     location: .init(function: function, file: file, line: line, column: column),
                     scope: $0.scope))
                 return nil
@@ -134,7 +120,7 @@ extension Tests
                 error = .init(thrown: other, expected: expected)
             }
 
-            $0.failed.append(TestFailure<ExpectedFailureError<Thrown>>.init(error,
+            $0.failed.append(.init(error,
                 location: .init(function: function, file: file, line: line, column: column),
                 scope: $0.scope))
         }
@@ -164,7 +150,7 @@ extension Tests
             }
             catch let error
             {
-                $0.failed.append(TestFailure<any Error>.init(error,
+                $0.failed.append(.init(error,
                     location: .init(function: function, file: file, line: line, column: column),
                     scope: $0.scope))
                 return nil
@@ -198,7 +184,7 @@ extension Tests
                 error = .init(thrown: other, expected: expected)
             }
 
-            $0.failed.append(TestFailure<ExpectedFailureError<Thrown>>.init(error,
+            $0.failed.append(.init(error,
                 location: .init(function: function, file: file, line: line, column: column),
                 scope: $0.scope))
         }
@@ -221,7 +207,7 @@ extension Tests
         }
         else
         {
-            self.failed.append(TestFailure<AssertionError>.init(.init(),
+            self.failed.append(.init(AssertionError.init(),
                 location: .init(function: function, file: file, line: line, column: column),
                 scope: self.scope + [name]))
         }
@@ -237,7 +223,7 @@ extension Tests
     {
         if let failure:Expectation = failure
         {
-            self.failed.append(TestFailure<Expectation>.init(failure,
+            self.failed.append(.init(failure,
                 location: .init(function: function, file: file, line: line, column: column),
                 scope: self.scope + [name]))
         }
@@ -263,7 +249,7 @@ extension Tests
         else 
         {
             let error:OptionalUnwrapError<Wrapped> = .init()
-            self.failed.append(TestFailure<OptionalUnwrapError<Wrapped>>.init(error,
+            self.failed.append(.init(error,
                 location: .init(function: function, file: file, line: line, column: column),
                 scope: self.scope + [name]))
             return nil
