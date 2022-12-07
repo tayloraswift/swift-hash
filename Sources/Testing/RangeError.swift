@@ -31,7 +31,7 @@ extension RangeError:CustomStringConvertible
 }
 
 public
-func ~=? <Sample>(allowed:ClosedRange<Sample>, sampled:Sample) -> RangeError<Sample>
+func ~=? <Sample>(allowed:ClosedRange<Sample>, sampled:Sample) -> RangeError<Sample>?
 {
-    .init(allowed: allowed, sampled: sampled)
+    allowed ~= sampled ? nil : .init(allowed: allowed, sampled: sampled)
 }
