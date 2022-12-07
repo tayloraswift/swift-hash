@@ -1,18 +1,18 @@
 public
 struct Tests
 {
-    public private(set)
+    public
     var passed:Int
 
     #if swift(<5.7)
-    public private(set)
+    public
     var failed:[Error]
     #else
-    public private(set)
+    public
     var failed:[any Error]
     #endif
 
-    private
+    public private(set)
     var scope:[String]
 
     public
@@ -23,39 +23,7 @@ struct Tests
         self.scope = []
     }
 }
-extension Tests
-{
-    public
-    struct Failures:Error
-    {
-    }
-    public
-    struct Failure<Assertion>:Error, CustomStringConvertible
-    {
-        public
-        let location:SourceLocation
-        public
-        let assertion:Assertion
-        public
-        let scope:[String]
 
-        public
-        init(_ assertion:Assertion, location:SourceLocation, scope:[String])
-        {
-            self.assertion = assertion
-            self.location = location
-            self.scope = scope
-        }
-        public 
-        var description:String
-        {
-            """
-            \(self.scope.joined(separator: ".")): \(self.assertion)
-            note: at \(self.location)
-            """
-        }
-    }
-}
 extension Tests
 {
     @discardableResult
@@ -107,7 +75,7 @@ extension Tests
         }
         #endif
 
-        throw Failures.init()
+        throw TestFailures.init()
     }
 }
 
@@ -132,7 +100,7 @@ extension Tests
             }
             catch let error
             {
-                $0.failed.append(Failure<Assert.Success>.init(.init(caught: error),
+                $0.failed.append(TestFailure<any Error>.init(error,
                     location: .init(function: function, file: file, line: line, column: column),
                     scope: $0.scope))
                 return nil
@@ -150,7 +118,7 @@ extension Tests
     {
         self.group(name)
         {
-            let error:Assert.ThrownError<Thrown>
+            let error:ExpectedFailureError<Thrown>
             do
             {
                 try body(&$0)
@@ -166,7 +134,7 @@ extension Tests
                 error = .init(thrown: other, expected: expected)
             }
 
-            $0.failed.append(Failure<Assert.ThrownError<Thrown>>.init(error,
+            $0.failed.append(TestFailure<ExpectedFailureError<Thrown>>.init(error,
                 location: .init(function: function, file: file, line: line, column: column),
                 scope: $0.scope))
         }
@@ -196,7 +164,7 @@ extension Tests
             }
             catch let error
             {
-                $0.failed.append(Failure<Assert.Success>.init(.init(caught: error),
+                $0.failed.append(TestFailure<any Error>.init(error,
                     location: .init(function: function, file: file, line: line, column: column),
                     scope: $0.scope))
                 return nil
@@ -214,7 +182,7 @@ extension Tests
     {
         await self.group(name)
         {
-            let error:Assert.ThrownError<Thrown>
+            let error:ExpectedFailureError<Thrown>
             do
             {
                 try await body(&$0)
@@ -230,7 +198,7 @@ extension Tests
                 error = .init(thrown: other, expected: expected)
             }
 
-            $0.failed.append(Failure<Assert.ThrownError<Thrown>>.init(error,
+            $0.failed.append(TestFailure<ExpectedFailureError<Thrown>>.init(error,
                 location: .init(function: function, file: file, line: line, column: column),
                 scope: $0.scope))
         }
@@ -253,22 +221,23 @@ extension Tests
         }
         else
         {
-            self.failed.append(Failure<Assert.True>.init(.init(),
+            self.failed.append(TestFailure<AssertionError>.init(.init(),
                 location: .init(function: function, file: file, line: line, column: column),
                 scope: self.scope + [name]))
         }
     }
 
     public mutating 
-    func assert<T>(_ failure:Assert.Equivalence<T>?, name:String,
+    func assert<Expectation>(_ failure:Expectation?, name:String,
         function:String = #function, 
         file:String = #file, 
         line:Int = #line, 
         column:Int = #column) 
+        where Expectation:ExpectationError
     {
-        if let failure:Assert.Equivalence<T> = failure
+        if let failure:Expectation = failure
         {
-            self.failed.append(Failure<Assert.Equivalence<T>>.init(failure,
+            self.failed.append(TestFailure<Expectation>.init(failure,
                 location: .init(function: function, file: file, line: line, column: column),
                 scope: self.scope + [name]))
         }
@@ -293,8 +262,8 @@ extension Tests
         }
         else 
         {
-            let error:Assert.OptionalUnwrap<Wrapped> = .init()
-            self.failed.append(Failure<Assert.OptionalUnwrap<Wrapped>>.init(error,
+            let error:OptionalUnwrapError<Wrapped> = .init()
+            self.failed.append(TestFailure<OptionalUnwrapError<Wrapped>>.init(error,
                 location: .init(function: function, file: file, line: line, column: column),
                 scope: self.scope + [name]))
             return nil
