@@ -4,7 +4,8 @@ protocol SyncTestEnvironment<Context>:TestCase
 {
     associatedtype Context
 
-    func withContext<Success>(run body:(Context) throws -> Success) throws -> Success
+    func runWithContext<Success>(tests:inout Tests,
+        body:(inout Tests, Context) throws -> Success) throws -> Success
 }
 
 #else
@@ -13,15 +14,17 @@ protocol SyncTestEnvironment:TestCase
 {
     associatedtype Context
 
-    func withContext<Success>(run body:(Context) throws -> Success) throws -> Success
+    func runWithContext<Success>(tests:inout Tests,
+        body:(inout Tests, Context) throws -> Success) throws -> Success
 }
 #endif
 
 extension SyncTestEnvironment where Context == Self
 {
     @inlinable public
-    func withContext<Success>(run body:(Self) throws -> Success) throws -> Success
+    func runWithContext<Success>(tests:inout Tests,
+        body:(inout Tests, Self) throws -> Success) throws -> Success
     {
-        try body(self)
+        try body(&tests, self)
     }
 }

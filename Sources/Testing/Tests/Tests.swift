@@ -36,10 +36,10 @@ extension Tests
     /// test bench outside of the closure.
     @discardableResult
     public mutating
-    func group<T>(_ namespace:String, running run:(inout Self) -> T) -> T
+    func group<T>(_ namespace:String, body:(inout Self) -> T) -> T
     {
         var group:Self = self.appending(scope: namespace)
-        return run(&group)
+        return body(&group)
     }
 
     @discardableResult
@@ -70,7 +70,7 @@ extension Tests
     {
         self.test(name: environment.name)
         {
-            (self:inout Self) in try environment.withContext { try body(&self, $0) }
+            try environment.runWithContext(tests: &$0, body: body)
         }
     }
     public mutating 
@@ -158,7 +158,7 @@ extension Tests
     {
         await self.test(name: environment.name)
         {
-            (self:inout Self) in try await environment.withContext { try await body(&self, $0) }
+            try await environment.runWithContext(tests: &$0, body: body)
         }
     }
     public mutating 
