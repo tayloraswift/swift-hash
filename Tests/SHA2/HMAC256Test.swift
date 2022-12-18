@@ -28,6 +28,3 @@ extension MessageAuthenticationTest:SyncTestCase
         tests.assert(computed ==? self.expected, name: "hmacs-equal")
     }
 }
-extension MessageAuthenticationTest:SyncTestEnvironment
-{
-}

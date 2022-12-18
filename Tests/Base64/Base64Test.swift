@@ -62,6 +62,3 @@ extension Base64Test:SyncTestCase
         }
     }
 }
-extension Base64Test:SyncTestEnvironment
-{
-}

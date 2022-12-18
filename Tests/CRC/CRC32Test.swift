@@ -24,6 +24,3 @@ extension CRC32Test:SyncTestCase
         tests.assert(computed ==? self.expected, name: "checksums-equal")
     }
 }
-extension CRC32Test:SyncTestEnvironment
-{
-}
