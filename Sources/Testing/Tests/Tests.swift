@@ -36,10 +36,10 @@ extension Tests
     /// test bench outside of the closure.
     @discardableResult
     public mutating
-    func group<T>(_ namespace:String, running run:(inout Self) -> T) -> T
+    func group<T>(_ namespace:String, body:(inout Self) -> T) -> T
     {
         var group:Self = self.appending(scope: namespace)
-        return run(&group)
+        return body(&group)
     }
 
     @discardableResult
@@ -64,36 +64,27 @@ extension Tests
     }
     @discardableResult
     public mutating 
-    func test<T, Environment>(name:String, with environment:Environment,
+    func test<T, Environment>(with environment:Environment,
         body:(inout Self, Environment.Context) throws -> T) -> T?
         where   Environment:SyncTestEnvironment
     {
-        environment.withContext
+        self.test(name: environment.name)
         {
-            (context:Environment.Context) in
-            self.test(name: name) { try body(&$0, context) } 
+            try environment.runWithContext(tests: &$0, body: body)
         }
     }
     public mutating 
-    func test<Environment>(case environment:Environment)
-        where   Environment:SyncTestEnvironment, Environment.Context:SyncTestCase
+    func test<Case>(case:Case)
+        where   Case:SyncTestCase
     {
-        environment.withContext
-        {
-            (context:Environment.Context) in
-            self.test(name: context.name, body: context.run(tests:)) ?? ()
-        }
+        self.test(name: `case`.name, body: `case`.run(tests:)) ?? ()
     }
     public mutating
-    func test<Environment, Thrown>(case environment:Environment, expecting error:Thrown)
-        where   Environment:SyncTestEnvironment, Environment.Context:SyncTestCase,
+    func test<Case, Thrown>(case:Case, expecting error:Thrown)
+        where   Case:SyncTestCase,
                 Thrown:Error & Equatable
     {
-        environment.withContext
-        {
-            (context:Environment.Context) in
-            self.test(name: context.name, expecting: error, body: context.run(tests:))
-        }
+        self.test(name: `case`.name, expecting: error, body: `case`.run(tests:))
     }
     public mutating 
     func test<Thrown>(name:String, expecting expected:Thrown,
@@ -158,39 +149,32 @@ extension Tests
             }
         }
     }
+
     @discardableResult
     public mutating 
-    func test<T, Environment>(name:String, with environment:Environment,
+    func test<T, Environment>(with environment:Environment,
         body:(inout Self, Environment.Context) async throws -> T) async -> T?
-        where Environment:AsyncTestEnvironment
+        where   Environment:AsyncTestEnvironment
     {
-        await environment.withContext
+        await self.test(name: environment.name)
         {
-            (context:Environment.Context) in
-            await self.test(name: name) { try await body(&$0, context) } 
+            try await environment.runWithContext(tests: &$0, body: body)
         }
     }
     public mutating 
-    func test<Environment>(case environment:Environment) async
-        where Environment:AsyncTestEnvironment, Environment.Context:AsyncTestCase
+    func test<Case>(case:Case) async 
+        where   Case:AsyncTestCase
     {
-        await environment.withContext
-        {
-            (context:Environment.Context) in
-            await self.test(name: context.name, body: context.run(tests:)) ?? ()
-        }
+        await self.test(name: `case`.name, body: `case`.run(tests:)) ?? ()
     }
     public mutating
-    func test<Environment, Thrown>(case environment:Environment, expecting error:Thrown) async
-        where   Environment:AsyncTestEnvironment, Environment.Context:AsyncTestCase,
+    func test<Case, Thrown>(case:Case, expecting error:Thrown) async 
+        where   Case:AsyncTestCase,
                 Thrown:Error & Equatable
     {
-        await environment.withContext
-        {
-            (context:Environment.Context) in
-            await self.test(name: context.name, expecting: error, body: context.run(tests:))
-        }
+        await self.test(name: `case`.name, expecting: error, body: `case`.run(tests:))
     }
+
     public mutating 
     func test<Thrown>(name:String, expecting expected:Thrown,
         body:(inout Self) async throws -> ()) async

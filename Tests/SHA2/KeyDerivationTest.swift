@@ -31,6 +31,3 @@ extension KeyDerivationTest:SyncTestCase
         tests.assert(key.prefix(self.derived.count) ..? self.derived, name: "keys-equal")
     }
 }
-extension KeyDerivationTest:SyncTestEnvironment
-{
-}
