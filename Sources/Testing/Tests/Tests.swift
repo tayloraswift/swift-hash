@@ -70,7 +70,7 @@ extension Tests
     {
         self.test(name: name)
         {
-            try environment.withContext(tests: &$0, run: body)
+            (self:inout Self) in try environment.withContext { try body(&self, $0) }
         }
     }
     public mutating 
@@ -153,12 +153,12 @@ extension Tests
     @discardableResult
     public mutating 
     func test<T, Environment>(name:String, with environment:Environment,
-        body:(inout Self, Environment.Context) throws -> T) async -> T?
+        body:(inout Self, Environment.Context) async throws -> T) async -> T?
         where   Environment:AsyncTestEnvironment
     {
         await self.test(name: name)
         {
-            try await environment.withContext(tests: &$0, run: body)
+            (self:inout Self) in try await environment.withContext { try await body(&self, $0) }
         }
     }
     public mutating 
