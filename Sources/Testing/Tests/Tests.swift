@@ -57,7 +57,7 @@ extension Tests
             }
             catch let error
             {
-                $0.results.failed.append(.init(error, location: nil, scope: $0.scope))
+                $0.results.failed.append(.init(error, scope: $0.scope))
                 return nil
             }
         }
@@ -66,7 +66,7 @@ extension Tests
     public mutating 
     func test<T, Environment>(name:String, with environment:Environment,
         body:(inout Self, Environment.Context) throws -> T) -> T?
-        where Environment:SyncTestEnvironment
+        where   Environment:SyncTestEnvironment
     {
         environment.withContext
         {
@@ -76,7 +76,7 @@ extension Tests
     }
     public mutating 
     func test<Environment>(case environment:Environment)
-        where Environment:SyncTestEnvironment, Environment.Context:SyncTestCase
+        where   Environment:SyncTestEnvironment, Environment.Context:SyncTestCase
     {
         environment.withContext
         {
@@ -84,15 +84,21 @@ extension Tests
             self.test(name: context.name, body: context.run(tests:)) ?? ()
         }
     }
-
+    public mutating
+    func test<Environment, Thrown>(case environment:Environment, expecting error:Thrown)
+        where   Environment:SyncTestEnvironment, Environment.Context:SyncTestCase,
+                Thrown:Error & Equatable
+    {
+        environment.withContext
+        {
+            (context:Environment.Context) in
+            self.test(name: context.name, expecting: error, body: context.run(tests:))
+        }
+    }
     public mutating 
     func test<Thrown>(name:String, expecting expected:Thrown,
-        function:String = #function, 
-        file:String = #file, 
-        line:Int = #line, 
-        column:Int = #column,
         body:(inout Self) throws -> ())
-        where Thrown:Error & Equatable
+        where   Thrown:Error & Equatable
     {
         self.group(name)
         {
@@ -112,9 +118,7 @@ extension Tests
                 error = .init(thrown: other, expected: expected)
             }
 
-            $0.results.failed.append(.init(error,
-                location: .init(function: function, file: file, line: line, column: column),
-                scope: $0.scope))
+            $0.results.failed.append(.init(error, scope: $0.scope))
         }
     }
 }
@@ -149,7 +153,7 @@ extension Tests
             }
             catch let error
             {
-                $0.results.failed.append(.init(error, location: nil, scope: $0.scope))
+                $0.results.failed.append(.init(error, scope: $0.scope))
                 return nil
             }
         }
@@ -176,13 +180,19 @@ extension Tests
             await self.test(name: context.name, body: context.run(tests:)) ?? ()
         }
     }
-    
+    public mutating
+    func test<Environment, Thrown>(case environment:Environment, expecting error:Thrown) async
+        where   Environment:AsyncTestEnvironment, Environment.Context:AsyncTestCase,
+                Thrown:Error & Equatable
+    {
+        await environment.withContext
+        {
+            (context:Environment.Context) in
+            await self.test(name: context.name, expecting: error, body: context.run(tests:))
+        }
+    }
     public mutating 
     func test<Thrown>(name:String, expecting expected:Thrown,
-        function:String = #function, 
-        file:String = #file, 
-        line:Int = #line, 
-        column:Int = #column,
         body:(inout Self) async throws -> ()) async
         where Thrown:Error & Equatable
     {
@@ -204,9 +214,7 @@ extension Tests
                 error = .init(thrown: other, expected: expected)
             }
 
-            $0.results.failed.append(.init(error,
-                location: .init(function: function, file: file, line: line, column: column),
-                scope: $0.scope))
+            $0.results.failed.append(.init(error, scope: $0.scope))
         }
     }
 }

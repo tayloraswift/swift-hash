@@ -13,7 +13,7 @@ extension Tests
         public
         let error:Error
         public
-        init(_ error:Error, location:SourceLocation?, scope:[String])
+        init(_ error:Error, location:SourceLocation? = nil, scope:[String])
         {
             self.error = error
             self.location = location
@@ -25,7 +25,7 @@ extension Tests
         public
         let error:any Error
         public
-        init(_ error:any Error, location:SourceLocation?, scope:[String])
+        init(_ error:any Error, location:SourceLocation? = nil, scope:[String])
         {
             self.error = error
             self.location = location
