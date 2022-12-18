@@ -19,3 +19,16 @@ protocol AsyncTestEnvironment
         _ body:(Context) async throws -> Success) async rethrows -> Success
 }
 #endif
+
+#if swift(>=5.5)
+@available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
+extension AsyncTestEnvironment where Context == Self
+{
+    @inlinable public
+    func withContext<Success>(
+        _ body:(Self) async throws -> Success) async rethrows -> Success
+    {
+        try await body(self)
+    }
+}
+#endif
