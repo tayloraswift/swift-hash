@@ -4,34 +4,26 @@ protocol SyncTestEnvironment<Context>
 {
     associatedtype Context
 
-    func withContext<Success>(
-        _ body:(Context) throws -> Success) rethrows -> Success
+    func withContext<Success>(tests:inout Tests,
+        run body:(inout Tests, Context) throws -> Success) throws -> Success
 }
-extension SyncTestEnvironment where Context == Self
-{
-    @inlinable public
-    func withContext<Success>(
-        _ body:(Self) throws -> Success) rethrows -> Success
-    {
-        try body(self)
-    }
-}
+
 #else
 public
 protocol SyncTestEnvironment
 {
     associatedtype Context
 
-    func withContext<Success>(
-        _ body:(Context) throws -> Success) rethrows -> Success
+    func withContext<Success>(tests:inout Tests,
+        run body:(inout Tests, Context) throws -> Success) throws -> Success
 }
+#endif
 extension SyncTestEnvironment where Context == Self
 {
     @inlinable public
-    func withContext<Success>(
-        _ body:(Self) throws -> Success) rethrows -> Success
+    func withContext<Success>(tests:inout Tests,
+        run body:(inout Tests, Self) throws -> Success) throws -> Success
     {
-        try body(self)
+        try body(&tests, self)
     }
 }
-#endif
