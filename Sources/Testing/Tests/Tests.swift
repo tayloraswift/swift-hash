@@ -2,78 +2,49 @@ public
 struct Tests
 {
     public
-    var passed:Int
+    let results:Results
     public
-    var failed:[TestFailure]
-    public private(set)
-    var scope:[String]
+    let scope:[String]
 
+    init(results:Results, scope:[String])
+    {
+        self.results = results
+        self.scope = scope
+    }
+}
+extension Tests
+{
     public
     init()
     {
-        self.passed = 0
-        self.failed = []
-        self.scope = []
+        self.init(results: .init(), scope: [])
     }
 }
 
 extension Tests
 {
-    @discardableResult
-    public mutating
-    func group<T>(_ name:String, running run:(inout Self) -> T) -> T
+    func appending(scope:String) -> Self
     {
-        self.scope.append(name)
-        defer
-        {
-            self.scope.removeLast()
-        }
-        return run(&self)
-    }
-
-    #if swift(>=5.5)
-    @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
-    @discardableResult
-    public mutating
-    func group<T>(_ name:String, running run:@Sendable (inout Self) async -> T) async -> T
-    {
-        self.scope.append(name)
-        defer
-        {
-            self.scope.removeLast()
-        }
-        return await run(&self)
-    }
-    #endif
-    
-    public
-    func summarize() throws
-    {
-        print("passed: \(self.passed) test(s)")
-        if self.failed.isEmpty
-        {
-            return
-        }
-        print("failed: \(self.failed.count) test(s)")
-
-        for (ordinal, failure):(Int, TestFailure) in self.failed.enumerated()
-        {
-            print("\(ordinal). \(failure)")
-        }
-
-        throw TestFailures.init()
+        .init(results: self.results, scope: self.scope + [scope])
     }
 }
 
 extension Tests
 {
+    /// Creates a testing scope with the given namespace added.
+    /// The method is `mutating` to prevent accidental use of the
+    /// test bench outside of the closure.
+    @discardableResult
+    public mutating
+    func group<T>(_ namespace:String, running run:(inout Self) -> T) -> T
+    {
+        var group:Self = self.appending(scope: namespace)
+        return run(&group)
+    }
+
     @discardableResult
     public mutating 
-    func `do`<T>(name:String,
-        function:String = #function, 
-        file:String = #file, 
-        line:Int = #line, 
-        column:Int = #column,
+    func test<T>(name:String,
         body:(inout Self) throws -> T) -> T?
     {
         self.group(name)
@@ -81,20 +52,39 @@ extension Tests
             do
             {
                 let returned:T = try body(&$0)
-                $0.passed += 1
+                $0.results.passed += 1
                 return returned
             }
             catch let error
             {
-                $0.failed.append(.init(error,
-                    location: .init(function: function, file: file, line: line, column: column),
-                    scope: $0.scope))
+                $0.results.failed.append(.init(error, location: nil, scope: $0.scope))
                 return nil
             }
         }
     }
+    @discardableResult
     public mutating 
-    func `do`<Thrown>(name:String, expecting expected:Thrown,
+    func test<T, Context>(name:String, with environment:some SyncTestEnvironment<Context>,
+        body:(inout Self, Context) throws -> T) -> T?
+    {
+        environment.withContext
+        {
+            (context:Context) in self.test(name: name) { try body(&$0, context) } 
+        }
+    }
+    public mutating 
+    func test<Context>(case environment:some SyncTestEnvironment<Context>)
+        where Context:SyncTestCase
+    {
+        environment.withContext
+        {
+            (context:Context) in self.test(name: context.name,
+                body: context.run(tests:)) ?? ()
+        }
+    }
+
+    public mutating 
+    func test<Thrown>(name:String, expecting expected:Thrown,
         function:String = #function, 
         file:String = #file, 
         line:Int = #line, 
@@ -112,7 +102,7 @@ extension Tests
             }
             catch expected as Thrown
             {
-                $0.passed += 1
+                $0.results.passed += 1
                 return
             }
             catch let other
@@ -120,7 +110,7 @@ extension Tests
                 error = .init(thrown: other, expected: expected)
             }
 
-            $0.failed.append(.init(error,
+            $0.results.failed.append(.init(error,
                 location: .init(function: function, file: file, line: line, column: column),
                 scope: $0.scope))
         }
@@ -131,39 +121,65 @@ extension Tests
 @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
 extension Tests
 {
+    /// Creates an asynchronous testing scope with the given namespace
+    /// added. The method is `mutating` to prevent accidental use of
+    /// the test bench outside of the closure.
+    @discardableResult
+    public mutating
+    func group<T>(_ namespace:String, running run:(inout Self) async -> T) async -> T
+    {
+        var group:Self = self.appending(scope: namespace)
+        return await run(&group)
+    }
+
     @discardableResult
     public mutating 
-    func `do`<T>(name:String,
-        function:String = #function, 
-        file:String = #file, 
-        line:Int = #line, 
-        column:Int = #column,
-        body:@Sendable (inout Self) async throws -> T) async -> T?
+    func test<T>(name:String,
+        body:(inout Self) async throws -> T) async -> T?
     {
         await self.group(name)
         {
             do
             {
                 let returned:T = try await body(&$0)
-                $0.passed += 1
+                $0.results.passed += 1
                 return returned
             }
             catch let error
             {
-                $0.failed.append(.init(error,
-                    location: .init(function: function, file: file, line: line, column: column),
-                    scope: $0.scope))
+                $0.results.failed.append(.init(error, location: nil, scope: $0.scope))
                 return nil
             }
         }
     }
+    @discardableResult
     public mutating 
-    func `do`<Thrown>(name:String, expecting expected:Thrown,
+    func test<T, Context>(name:String, with environment:some AsyncTestEnvironment<Context>,
+        body:(inout Self, Context) async throws -> T) async -> T?
+    {
+        await environment.withContext
+        {
+            (context:Context) in await self.test(name: name) { try await body(&$0, context) } 
+        }
+    }
+    public mutating 
+    func test<Context>(case environment:some AsyncTestEnvironment<Context>) async
+        where Context:AsyncTestCase
+    {
+        await environment.withContext
+        {
+            (context:Context) in await self.test(name: context.name,
+                body: context.run(tests:)) ?? ()
+        }
+    }
+    
+    public mutating 
+    func test<Thrown>(name:String, expecting expected:Thrown,
         function:String = #function, 
         file:String = #file, 
         line:Int = #line, 
         column:Int = #column,
-        body:@Sendable (inout Self) async throws -> ()) async
+        body:(inout Self) async throws -> ()) async
         where Thrown:Error & Equatable
     {
         await self.group(name)
@@ -176,7 +192,7 @@ extension Tests
             }
             catch expected as Thrown
             {
-                $0.passed += 1
+                $0.results.passed += 1
                 return
             }
             catch let other
@@ -184,7 +200,7 @@ extension Tests
                 error = .init(thrown: other, expected: expected)
             }
 
-            $0.failed.append(.init(error,
+            $0.results.failed.append(.init(error,
                 location: .init(function: function, file: file, line: line, column: column),
                 scope: $0.scope))
         }
@@ -194,7 +210,7 @@ extension Tests
 
 extension Tests
 {
-    public mutating 
+    public 
     func assert(_ bool:Bool, name:String,
         function:String = #function,
         file:String = #file,
@@ -203,17 +219,17 @@ extension Tests
     {
         if  bool
         {
-            self.passed += 1
+            self.results.passed += 1
         }
         else
         {
-            self.failed.append(.init(AssertionError.init(),
+            self.results.failed.append(.init(AssertionError.init(),
                 location: .init(function: function, file: file, line: line, column: column),
                 scope: self.scope + [name]))
         }
     }
 
-    public mutating 
+    public 
     func assert<Expectation>(_ failure:Expectation?, name:String,
         function:String = #function, 
         file:String = #file, 
@@ -223,19 +239,19 @@ extension Tests
     {
         if let failure:Expectation = failure
         {
-            self.failed.append(.init(failure,
+            self.results.failed.append(.init(failure,
                 location: .init(function: function, file: file, line: line, column: column),
                 scope: self.scope + [name]))
         }
         else 
         {
-            self.passed += 1
+            self.results.passed += 1
         }
     }
 }
 extension Tests
 {
-    public mutating
+    public
     func unwrap<Wrapped>(_ optional:Wrapped?, name:String,
         file:String = #file, 
         function:String = #function, 
@@ -249,7 +265,7 @@ extension Tests
         else 
         {
             let error:OptionalUnwrapError<Wrapped> = .init()
-            self.failed.append(.init(error,
+            self.results.failed.append(.init(error,
                 location: .init(function: function, file: file, line: line, column: column),
                 scope: self.scope + [name]))
             return nil
