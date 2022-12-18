@@ -1,14 +1,14 @@
 import Testing
 
 @main 
-enum Main:SynchronousTests
+enum Main:SyncTests
 {
     static
     func run(tests:inout Tests)
     {
         tests.group("binary")
         {
-            $0.test(name: "all",
+            $0.test(case: Base64Test.init(name: "all",
                 degenerate:
                 """
                 AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4v\
@@ -27,9 +27,9 @@ enum Main:SynchronousTests
                 wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t/g4eLj5OXm5+jp6uvs7e7v\
                 8PHy8/T19vf4+fr7/P3+/w==
                 """,
-                expected: 0x00 ... 0xff)
+                expected: 0x00 ... 0xff))
             
-            $0.test(name: "reversed",
+            $0.test(case: Base64Test.init(name: "reversed",
                 degenerate:
                 """
                 //79/Pv6+fj39vX08/Lx8O/u7ezr6uno5+bl5OPi4eDf3t3c29rZ2NfW1dTT0tHQ\
@@ -48,34 +48,34 @@ enum Main:SynchronousTests
                 Pz49PDs6OTg3NjU0MzIxMC8uLSwrKikoJyYlJCMiISAfHh0cGxoZGBcWFRQTEhEQ\
                 Dw4NDAsKCQgHBgUEAwIBAA==
                 """,
-                expected: (0x00 ... 0xff).reversed())
+                expected: (0x00 ... 0xff).reversed()))
         }
 
         tests.group("string")
         {
-            $0.test(name: "empty",
+            $0.test(case: Base64Test.init(name: "empty",
                 canonical: "",
-                expected: "")
+                expected: ""))
             
-            $0.test(name: "single",
+            $0.test(case: Base64Test.init(name: "single",
                 degenerate: "YQ",
                 canonical: "YQ==",
-                expected: "a")
+                expected: "a"))
             
-            $0.test(name: "double",
+            $0.test(case: Base64Test.init(name: "double",
                 degenerate: "YWI",
                 canonical: "YWI=",
-                expected: "ab")
+                expected: "ab"))
             
-            $0.test(name: "triple",
+            $0.test(case: Base64Test.init(name: "triple",
                 canonical: "YWJj",
-                expected: "abc")
+                expected: "abc"))
             
-            $0.test(name: "basic",
+            $0.test(case: Base64Test.init(name: "basic",
                 canonical: "TWFueSBoYW5kcyBtYWtlIGxpZ2h0IHdvcmsu",
-                expected: "Many hands make light work.")
+                expected: "Many hands make light work."))
             
-            $0.test(name: "whitespace",
+            $0.test(case: Base64Test.init(name: "whitespace",
                 degenerate: 
                 """
                 T\u{0C}WFueSBoY W5kc\ryBtYWt\tlIGxpZ2
@@ -84,31 +84,31 @@ enum Main:SynchronousTests
                 vcmsu 
                 """,
                 canonical: "TWFueSBoYW5kcyBtYWtlIGxpZ2h0IHdvcmsu",
-                expected: "Many hands make light work.")
+                expected: "Many hands make light work."))
             
-            $0.test(name: "padding-11-16",
+            $0.test(case: Base64Test.init(name: "padding-11-16",
                 degenerate: "bGlnaHQgd29yay4",
                 canonical: "bGlnaHQgd29yay4=",
-                expected: "light work.")
+                expected: "light work."))
             
-            $0.test(name: "padding-10-16",
+            $0.test(case: Base64Test.init(name: "padding-10-16",
                 degenerate: "bGlnaHQgd29yaw",
                 canonical: "bGlnaHQgd29yaw==",
-                expected: "light work")
+                expected: "light work"))
             
-            $0.test(name: "padding-9-12",
+            $0.test(case: Base64Test.init(name: "padding-9-12",
                 canonical: "bGlnaHQgd29y",
-                expected: "light wor")
+                expected: "light wor"))
             
-            $0.test(name: "padding-8-12",
+            $0.test(case: Base64Test.init(name: "padding-8-12",
                 degenerate: "bGlnaHQgd28",
                 canonical: "bGlnaHQgd28=",
-                expected: "light wo")
+                expected: "light wo"))
             
-            $0.test(name: "padding-7-12",
+            $0.test(case: Base64Test.init(name: "padding-7-12",
                 degenerate: "bGlnaHQgdw",
                 canonical: "bGlnaHQgdw==",
-                expected: "light w")
+                expected: "light w"))
         }
     }
 }

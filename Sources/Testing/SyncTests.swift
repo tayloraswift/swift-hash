@@ -1,16 +1,16 @@
 public
-protocol SynchronousTests
+protocol SyncTests
 {
     static
     func run(tests:inout Tests)
 }
-extension SynchronousTests
+extension SyncTests
 {
     public static
     func main() throws
     {
         var tests:Tests = .init()
         Self.run(tests: &tests)
-        try tests.summarize()
+        try tests.results.summarize()
     }
 }

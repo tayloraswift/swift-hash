@@ -2,16 +2,17 @@ import CRC
 import Testing
 
 @main 
-enum Main:SynchronousTests
+enum Main:SyncTests
 {
-    static
-    func run(tests:inout Tests)
-    {
-        // https://www.rfc-editor.org/rfc/rfc3720#appendix-B.4
-        tests.test(name: "basic", message: "123456789", expected: 0xcb_f4_39_26)
+   static
+   func run(tests:inout Tests)
+   {
+      // https://www.rfc-editor.org/rfc/rfc3720#appendix-B.4
+      tests.test(case: CRC32Test.init(name: "basic", message: "123456789",
+         expected: 0xcb_f4_39_26))
 
-        tests.test(name: "apache-license",
-            message: 
+      tests.test(case: CRC32Test.init(name: "apache-license",
+         message:
             """
             
                                              Apache License
@@ -217,6 +218,6 @@ enum Main:SynchronousTests
                limitations under the License.
             
             """,
-            expected: 0xaf_fb_88_44)
-    }
+         expected: 0xaf_fb_88_44))
+   }
 }
