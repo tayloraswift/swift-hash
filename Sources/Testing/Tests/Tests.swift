@@ -64,22 +64,24 @@ extension Tests
     }
     @discardableResult
     public mutating 
-    func test<T, Context>(name:String, with environment:some SyncTestEnvironment<Context>,
-        body:(inout Self, Context) throws -> T) -> T?
+    func test<T, Environment>(name:String, with environment:Environment,
+        body:(inout Self, Environment.Context) throws -> T) -> T?
+        where Environment:SyncTestEnvironment
     {
         environment.withContext
         {
-            (context:Context) in self.test(name: name) { try body(&$0, context) } 
+            (context:Environment.Context) in
+            self.test(name: name) { try body(&$0, context) } 
         }
     }
     public mutating 
-    func test<Context>(case environment:some SyncTestEnvironment<Context>)
-        where Context:SyncTestCase
+    func test<Environment>(case environment:Environment)
+        where Environment:SyncTestEnvironment, Environment.Context:SyncTestCase
     {
         environment.withContext
         {
-            (context:Context) in self.test(name: context.name,
-                body: context.run(tests:)) ?? ()
+            (context:Environment.Context) in
+            self.test(name: context.name, body: context.run(tests:)) ?? ()
         }
     }
 
@@ -154,22 +156,24 @@ extension Tests
     }
     @discardableResult
     public mutating 
-    func test<T, Context>(name:String, with environment:some AsyncTestEnvironment<Context>,
-        body:(inout Self, Context) async throws -> T) async -> T?
+    func test<T, Environment>(name:String, with environment:Environment,
+        body:(inout Self, Environment.Context) async throws -> T) async -> T?
+        where Environment:AsyncTestEnvironment
     {
         await environment.withContext
         {
-            (context:Context) in await self.test(name: name) { try await body(&$0, context) } 
+            (context:Environment.Context) in
+            await self.test(name: name) { try await body(&$0, context) } 
         }
     }
     public mutating 
-    func test<Context>(case environment:some AsyncTestEnvironment<Context>) async
-        where Context:AsyncTestCase
+    func test<Environment>(case environment:Environment) async
+        where Environment:AsyncTestEnvironment, Environment.Context:AsyncTestCase
     {
         await environment.withContext
         {
-            (context:Context) in await self.test(name: context.name,
-                body: context.run(tests:)) ?? ()
+            (context:Environment.Context) in
+            await self.test(name: context.name, body: context.run(tests:)) ?? ()
         }
     }
     
