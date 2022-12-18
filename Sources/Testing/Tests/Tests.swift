@@ -64,11 +64,11 @@ extension Tests
     }
     @discardableResult
     public mutating 
-    func test<T, Environment>(name:String, with environment:Environment,
+    func test<T, Environment>(with environment:Environment,
         body:(inout Self, Environment.Context) throws -> T) -> T?
         where   Environment:SyncTestEnvironment
     {
-        self.test(name: name)
+        self.test(name: environment.name)
         {
             (self:inout Self) in try environment.withContext { try body(&self, $0) }
         }
@@ -152,11 +152,11 @@ extension Tests
 
     @discardableResult
     public mutating 
-    func test<T, Environment>(name:String, with environment:Environment,
+    func test<T, Environment>(with environment:Environment,
         body:(inout Self, Environment.Context) async throws -> T) async -> T?
         where   Environment:AsyncTestEnvironment
     {
-        await self.test(name: name)
+        await self.test(name: environment.name)
         {
             (self:inout Self) in try await environment.withContext { try await body(&self, $0) }
         }

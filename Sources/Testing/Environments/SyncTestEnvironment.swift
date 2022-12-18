@@ -1,6 +1,6 @@
 #if swift(>=5.7)
 public
-protocol SyncTestEnvironment<Context>
+protocol SyncTestEnvironment<Context>:TestCase
 {
     associatedtype Context
 
@@ -9,13 +9,14 @@ protocol SyncTestEnvironment<Context>
 
 #else
 public
-protocol SyncTestEnvironment
+protocol SyncTestEnvironment:TestCase
 {
     associatedtype Context
 
     func withContext<Success>(run body:(Context) throws -> Success) throws -> Success
 }
 #endif
+
 extension SyncTestEnvironment where Context == Self
 {
     @inlinable public

@@ -1,7 +1,7 @@
 #if swift(>=5.7)
 @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
 public
-protocol AsyncTestEnvironment<Context>
+protocol AsyncTestEnvironment<Context>:TestCase
 {
     associatedtype Context
 
@@ -10,7 +10,7 @@ protocol AsyncTestEnvironment<Context>
 #elseif swift(>=5.5)
 @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
 public
-protocol AsyncTestEnvironment
+protocol AsyncTestEnvironment:TestCase
 {
     associatedtype Context
 
