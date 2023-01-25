@@ -1,31 +1,34 @@
 infix operator ==? :ComparisonPrecedence
 infix operator ..? :ComparisonPrecedence
 
-public
-struct OrderedEquivalenceError<Value>:ExpectationError
+extension Assertion
 {
     public
-    let lhs:Value
-    public
-    let rhs:Value
-
-    @inlinable public
-    init(lhs:Value, rhs:Value)
+    struct ExpectedEquivalentValue<Value>
     {
-        self.lhs = lhs
-        self.rhs = rhs
+        public
+        let lhs:Value
+        public
+        let rhs:Value
+
+        @inlinable public
+        init(lhs:Value, rhs:Value)
+        {
+            self.lhs = lhs
+            self.rhs = rhs
+        }
     }
 }
-extension OrderedEquivalenceError:CustomStringConvertible
+extension Assertion.ExpectedEquivalentValue:AssertionFailure
 {
     public 
     var description:String
     {
         """
-        expected equal values
+        Expected equal values:
         {
-            lhs: \(lhs),
-            rhs: \(rhs)
+            lhs: \(self.lhs),
+            rhs: \(self.rhs)
         }
         """
     }
@@ -34,7 +37,7 @@ extension OrderedEquivalenceError:CustomStringConvertible
 /// Compares the elements of two sequences, enforcing ordering.
 /// Perfer this operator over ``==?(_:_:)`` for improved diagnostics.
 @inlinable public
-func ..? <LHS, RHS>(lhs:LHS, rhs:RHS) -> OrderedEquivalenceError<[LHS.Element]>?
+func ..? <LHS, RHS>(lhs:LHS, rhs:RHS) -> Assertion.ExpectedEquivalentValue<[LHS.Element]>?
     where LHS:Sequence, RHS:Sequence, LHS.Element == RHS.Element, LHS.Element:Equatable
 {
     let rhs:[LHS.Element] = .init(rhs)
@@ -48,9 +51,9 @@ func ..? <LHS, RHS>(lhs:LHS, rhs:RHS) -> OrderedEquivalenceError<[LHS.Element]>?
         return .init(lhs: lhs, rhs: rhs)
     }
 }
-/// Compares two elements to equality.
+/// Compares two elements for equality.
 @inlinable public
-func ==? <T>(lhs:T, rhs:T) -> OrderedEquivalenceError<T>?
+func ==? <T>(lhs:T, rhs:T) -> Assertion.ExpectedEquivalentValue<T>?
     where T:Equatable
 {
     if  lhs == rhs

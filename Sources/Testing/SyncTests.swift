@@ -2,15 +2,15 @@ public
 protocol SyncTests
 {
     static
-    func run(tests:inout Tests)
+    func run(tests:Tests)
 }
 extension SyncTests
 {
     public static
     func main() throws
     {
-        var tests:Tests = .init()
-        Self.run(tests: &tests)
-        try tests.results.summarize()
+        let tests:Tests = .init()
+        Self.run(tests: tests)
+        try tests.summarize()
     }
 }

@@ -1,5 +1,4 @@
 import Base64
-import Testing
 
 struct Base64Test
 {
@@ -40,25 +39,5 @@ extension Base64Test
             degenerate: degenerate,
             canonical: canonical,
             expected: expected.utf8)
-    }
-}
-extension Base64Test:SyncTestCase
-{
-    func run(tests:inout Tests)
-    {
-        tests.assert(Base64.decode(self.canonical.utf8, to: [UInt8].self) ..? self.expected,
-            name: "decode-canonical")
-        tests.assert(Base64.encode(self.expected) ..? self.canonical,
-            name: "encode")
-
-        if let degenerate:String = self.degenerate
-        {
-            let decoded:[UInt8] = Base64.decode(degenerate, to: [UInt8].self)
-            let encoded:String = Base64.encode(decoded)
-            tests.assert(decoded ..? self.expected,
-                name: "decode-degenerate")
-            tests.assert(encoded ..? self.canonical,
-                name: "reencode")
-        }
     }
 }

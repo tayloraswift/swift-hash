@@ -4,7 +4,7 @@ public
 protocol AsyncTests
 {
     static
-    func run(tests:inout Tests) async
+    func run(tests:Tests) async
 }
 @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
 extension AsyncTests
@@ -12,9 +12,9 @@ extension AsyncTests
     public static
     func main() async throws
     {
-        var tests:Tests = .init()
-        await Self.run(tests: &tests)
-        try tests.results.summarize()
+        let tests:Tests = .init()
+        await Self.run(tests: tests)
+        try tests.summarize()
     }
 }
 #endif

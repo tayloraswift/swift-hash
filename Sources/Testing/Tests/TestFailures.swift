@@ -1,0 +1,4 @@
+public
+struct TestFailures:Error
+{
+}

@@ -1,15 +1,17 @@
+import Base16
+import SHA2
 import Testing
 
 @main
 enum Main:SyncTests
 {
     static
-    func run(tests:inout Tests)
+    func run(tests:Tests)
     {
         // https://datatracker.ietf.org/doc/html/rfc4231
-        tests.group("hmac-sha-256")
-        {
-            $0.test(case: MessageAuthenticationTest.init(name: "1",
+        for test:MessageAuthenticationTest in
+        [
+            .init(name: "1",
                 key: 
                 """
                 0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b
@@ -21,9 +23,9 @@ enum Main:SyncTests
                 b0344c61d8db38535ca8afceaf0bf12b
                 881dc200c9833da726e9376c2e32cff7
                 """
-            ))
+            ),
 
-            $0.test(case: MessageAuthenticationTest.init(name: "2",
+            .init(name: "2",
                 key: "4a656665",
                 message: 
                 """
@@ -35,9 +37,9 @@ enum Main:SyncTests
                 5bdcc146bf60754e6a042426089575c7
                 5a003f089d2739839dec58b964ec3843
                 """
-            ))
+            ),
 
-            $0.test(case: MessageAuthenticationTest.init(name: "3",
+            .init(name: "3",
                 key: 
                 """
                 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
@@ -55,9 +57,9 @@ enum Main:SyncTests
                 773ea91e36800e46854db8ebd09181a7
                 2959098b3ef8c122d9635514ced565fe
                 """
-            ))
+            ),
 
-            $0.test(case: MessageAuthenticationTest.init(name: "4",
+            .init(name: "4",
                 key: 
                 """
                 0102030405060708090a0b0c0d0e0f10
@@ -75,9 +77,9 @@ enum Main:SyncTests
                 82558a389a443c0ea4cc819899f2083a
                 85f0faa3e578f8077a2e3ff46729665b
                 """
-            ))
+            ),
 
-            $0.test(case: MessageAuthenticationTest.init(name: "5",
+            .init(name: "5",
                 key: 
                 """
                 0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c
@@ -93,9 +95,9 @@ enum Main:SyncTests
                 a3b6167473100ee06e0c796c2955552b
                 fa6f7c0a6a8aef8b93f860aab0cd20c5
                 """
-            ))
+            ),
 
-            $0.test(case: MessageAuthenticationTest.init(name: "6",
+            .init(name: "6",
                 key: 
                 """
                 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
@@ -120,9 +122,9 @@ enum Main:SyncTests
                 60e431591ee0b67f0d8a26aacbf5b77f
                 8e0bc6213728c5140546040f0ee37f54
                 """
-            ))
+            ),
 
-            $0.test(case: MessageAuthenticationTest.init(name: "7",
+            .init(name: "7",
                 key: 
                 """
                 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
@@ -153,13 +155,22 @@ enum Main:SyncTests
                 9b09ffa71b942fcb27635fbcd5b0e944
                 bfdc63644f0713938a7f51535c3a35e2
                 """
-            ))
+            ),
+        ]
+        {
+            let tests:TestGroup = tests / "hmac-sha-256" / test.name
+
+            let key:[UInt8] = Base16.decode(test.key.utf8)
+            let message:[UInt8] = Base16.decode(test.message.utf8)
+            
+            let computed:SHA256 = .init(authenticating: message, key: key)
+            tests.expect(computed ==? test.expected)
         }
 
         // https://stackoverflow.com/questions/5130513/pbkdf2-hmac-sha2-test-vectors
-        tests.group("pbkdf2-hmac-sha-256")
-        {
-            $0.test(case: KeyDerivationTest.init(name: "single-iteration", 
+        for test:KeyDerivationTest in
+        [
+            .init(name: "single-iteration", 
                 password: "password", salt: "salt", iterations: 1,
                 derived:
                 [
@@ -167,9 +178,9 @@ enum Main:SyncTests
                     0x43, 0xe7, 0x22, 0x52, 0x56, 0xc4, 0xf8, 0x37,
                     0xa8, 0x65, 0x48, 0xc9, 0x2c, 0xcc, 0x35, 0x48,
                     0x08, 0x05, 0x98, 0x7c, 0xb7, 0x0b, 0xe1, 0x7b,
-                ]))
+                ]),
             
-            $0.test(case: KeyDerivationTest.init(name: "multiple-iterations",
+            .init(name: "multiple-iterations",
                 password: "password", salt: "salt", iterations: 2,
                 derived:
                 [
@@ -177,9 +188,9 @@ enum Main:SyncTests
                     0x2d, 0x0a, 0xdf, 0xf9, 0x28, 0xf0, 0x6d, 0xd0,
                     0x2a, 0x30, 0x3f, 0x8e, 0xf3, 0xc2, 0x51, 0xdf,
                     0xd6, 0xe2, 0xd8, 0x5a, 0x95, 0x47, 0x4c, 0x43,
-                ]))
+                ]),
             
-            $0.test(case: KeyDerivationTest.init(name: "many-iterations",
+            .init(name: "many-iterations",
                 password: "password", salt: "salt", iterations: 4096,
                 derived:
                 [
@@ -187,7 +198,7 @@ enum Main:SyncTests
                     0xaa, 0x53, 0x0d, 0xb6, 0x84, 0x5c, 0x4c, 0x8d,
                     0x96, 0x28, 0x93, 0xa0, 0x01, 0xce, 0x4e, 0x11,
                     0xa4, 0x96, 0x38, 0x73, 0xaa, 0x98, 0x13, 0x4a,
-                ]))
+                ]),
             
             // disabled to keep the CI flowing
             
@@ -201,7 +212,7 @@ enum Main:SyncTests
             //         0x17, 0xad, 0x10, 0xe3, 0xac, 0x6e, 0xba, 0x46,
             //     ]))
             
-            $0.test(case: KeyDerivationTest.init(name: "multiple-blocks",
+            .init(name: "multiple-blocks",
                 password: "passwordPASSWORDpassword",
                 salt: "saltSALTsaltSALTsaltSALTsaltSALTsalt",
                 iterations: 4096,
@@ -212,16 +223,27 @@ enum Main:SyncTests
                     0x2b, 0x17, 0x34, 0x7e, 0xbc, 0x18, 0x00, 0x18,
                     0x1c, 0x4e, 0x2a, 0x1f, 0xb8, 0xdd, 0x53, 0xe1,
                     0xc6, 0x35, 0x51, 0x8c, 0x7d, 0xac, 0x47, 0xe9,
-                ]))
+                ]),
             
-            $0.test(case: KeyDerivationTest.init(name: "null-bytes",
+            .init(name: "null-bytes",
                 password: "pass\u{0}word", salt: "sa\u{0}lt",
                 iterations: 4096,
                 derived:
                 [
                     0x89, 0xb6, 0x9d, 0x05, 0x16, 0xf8, 0x29, 0x89,
                     0x3c, 0x69, 0x62, 0x26, 0x65, 0x0a, 0x86, 0x87,
-                ]))
+                ]),
+        ]
+        {
+            let tests:TestGroup = tests / "pbkdf2-hmac-sha-256" / test.name
+
+            let (quotient, remainder):(Int, Int) = test.derived.count.quotientAndRemainder(
+                dividingBy: SHA256.count)
+            let key:[UInt8] = SHA256.pbkdf2(password: test.password.utf8, salt: test.salt.utf8,
+                iterations: test.iterations,
+                blocks: quotient + max(remainder, 1))
+            
+            tests.expect(key.prefix(test.derived.count) ..? test.derived)
         }
     }
 }
