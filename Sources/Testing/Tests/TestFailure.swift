@@ -9,7 +9,7 @@ struct TestFailure
     public
     let failure:AssertionFailure
     public
-    init(_ error:Error, location:Assertion)
+    init(_ error:AssertionFailure, location:Assertion)
     {
         self.location = location
         self.error = error
