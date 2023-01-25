@@ -5,13 +5,15 @@ import Testing
 enum Main:SyncTests
 {
    static
-   func run(tests:inout Tests)
+   func run(tests:Tests)
    {
       // https://www.rfc-editor.org/rfc/rfc3720#appendix-B.4
-      tests.test(case: CRC32Test.init(name: "basic", message: "123456789",
-         expected: 0xcb_f4_39_26))
-
-      tests.test(case: CRC32Test.init(name: "apache-license",
+      let cases:[CRC32Test] =
+      [
+         .init(name: "basic", message: "123456789",
+            expected: 0xcb_f4_39_26),
+         
+         .init(name: "apache-license",
          message:
             """
             
@@ -218,6 +220,15 @@ enum Main:SyncTests
                limitations under the License.
             
             """,
-         expected: 0xaf_fb_88_44))
+         expected: 0xaf_fb_88_44),
+      ]
+
+      for test:CRC32Test in cases
+      {
+            let tests:TestGroup = tests / test.name
+
+            let computed:CRC32 = .init(hashing: test.message.utf8)
+            tests.expect(computed ==? test.expected)
+      }
    }
 }

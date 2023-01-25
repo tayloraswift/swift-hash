@@ -1,5 +1,4 @@
 import CRC
-import Testing
 
 struct CRC32Test
 {
@@ -14,13 +13,5 @@ struct CRC32Test
         self.name = name
         self.message = message
         self.expected = expected
-    }
-}
-extension CRC32Test:SyncTestCase
-{
-    func run(tests:inout Tests)
-    {            
-        let computed:CRC32 = .init(hashing: self.message.utf8)
-        tests.assert(computed ==? self.expected, name: "checksums-equal")
     }
 }

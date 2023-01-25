@@ -1,27 +1,30 @@
 infix operator **? :ComparisonPrecedence
 
-public
-struct UnorderedEquivalenceError<Element>:ExpectationError where Element:Hashable
+extension Assertion
 {
     public
-    let lhs:Set<Element>
-    public
-    let rhs:Set<Element>
-
-    @inlinable public
-    init(lhs:Set<Element>, rhs:Set<Element>)
+    struct ExpectedEquivalentSet<Element> where Element:Hashable
     {
-        self.lhs = lhs
-        self.rhs = rhs
+        public
+        let lhs:Set<Element>
+        public
+        let rhs:Set<Element>
+
+        @inlinable public
+        init(lhs:Set<Element>, rhs:Set<Element>)
+        {
+            self.lhs = lhs
+            self.rhs = rhs
+        }
     }
 }
-extension UnorderedEquivalenceError:CustomStringConvertible
+extension Assertion.ExpectedEquivalentSet:AssertionFailure
 {
     public 
     var description:String
     {
         """
-        expected equal elements
+        Expected equal elements:
         {
             lhs: \(self.lhs),
             rhs: \(self.rhs)
@@ -33,7 +36,7 @@ extension UnorderedEquivalenceError:CustomStringConvertible
 /// Compares the elements of two sequences, without enforcing ordering.
 /// Perfer this operator over ``==?(_:_:)`` for improved diagnostics.
 @inlinable public
-func **? <LHS, RHS>(lhs:LHS, rhs:RHS) -> OrderedEquivalenceError<Set<LHS.Element>>?
+func **? <LHS, RHS>(lhs:LHS, rhs:RHS) -> Assertion.ExpectedEquivalentSet<LHS.Element>?
     where LHS:Sequence, RHS:Sequence, LHS.Element == RHS.Element, LHS.Element:Hashable
 {
     let rhs:Set<LHS.Element> = .init(rhs)

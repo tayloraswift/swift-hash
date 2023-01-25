@@ -1,6 +1,5 @@
 import Base16
 import SHA2
-import Testing
 
 struct MessageAuthenticationTest
 {
@@ -15,16 +14,5 @@ struct MessageAuthenticationTest
         self.key = key
         self.message = message
         self.expected = expected
-    }
-}
-extension MessageAuthenticationTest:SyncTestCase
-{
-    func run(tests:inout Tests)
-    {            
-        let key:[UInt8] = Base16.decode(self.key.utf8)
-        let message:[UInt8] = Base16.decode(self.message.utf8)
-        
-        let computed:SHA256 = .init(authenticating: message, key: key)
-        tests.assert(computed ==? self.expected, name: "hmacs-equal")
     }
 }
