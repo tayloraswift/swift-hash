@@ -268,6 +268,7 @@ extension TestGroup
             self.tests.passed += 1
         }
     }
+    @discardableResult
     public
     func expect<Wrapped>(value optional:Wrapped?,
         function:String = #function, 
