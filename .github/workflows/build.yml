@@ -91,7 +91,7 @@ jobs:
                 run: |
                     docker run -t --rm \
                         --name swift-environment \
-                        -v $PWD:/swift-grammar \
-                        -w /swift-grammar \
+                        -v $PWD:/swift-hash \
+                        -w /swift-hash \
                         ${{ matrix.image }} \
                         /bin/bash $(echo .github/pipeline)
