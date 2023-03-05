@@ -1,0 +1,4 @@
+swift --version &&
+swift run -c release Base64Tests &&
+swift run -c release CRCTests &&
+swift run -c release SHA2Tests

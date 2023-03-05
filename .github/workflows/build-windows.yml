@@ -11,8 +11,8 @@ jobs:
         runs-on: ${{ matrix.os }}
         strategy:
             matrix:
-                os: [windows-2022, windows-2019]
-                swift: [5.6.2]
+                os: [windows-2022]
+                swift: [5.7.3]
         steps:
             -   name: checkout 
                 uses: actions/checkout@v2
@@ -29,6 +29,6 @@ jobs:
             -   name: test 
                 run: |
                     swift --version
-                    swift run -c release Base64Tests
-                    swift run -c release CRCTests
-                    swift run -c release SHA2Tests
+                    swift build -c release Base64
+                    swift build -c release CRC
+                    swift build -c release SHA2

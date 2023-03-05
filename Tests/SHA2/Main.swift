@@ -158,13 +158,14 @@ enum Main:SyncTests
             ),
         ]
         {
-            let tests:TestGroup = tests / "hmac-sha-256" / test.name
-
-            let key:[UInt8] = Base16.decode(test.key.utf8)
-            let message:[UInt8] = Base16.decode(test.message.utf8)
-            
-            let computed:SHA256 = .init(authenticating: message, key: key)
-            tests.expect(computed ==? test.expected)
+            if  let tests:TestGroup = tests / "hmac-sha-256" / test.name
+            {
+                let key:[UInt8] = Base16.decode(test.key.utf8)
+                let message:[UInt8] = Base16.decode(test.message.utf8)
+                
+                let computed:SHA256 = .init(authenticating: message, key: key)
+                tests.expect(computed ==? test.expected)
+            }
         }
 
         // https://stackoverflow.com/questions/5130513/pbkdf2-hmac-sha2-test-vectors
@@ -235,15 +236,17 @@ enum Main:SyncTests
                 ]),
         ]
         {
-            let tests:TestGroup = tests / "pbkdf2-hmac-sha-256" / test.name
-
-            let (quotient, remainder):(Int, Int) = test.derived.count.quotientAndRemainder(
-                dividingBy: SHA256.count)
-            let key:[UInt8] = SHA256.pbkdf2(password: test.password.utf8, salt: test.salt.utf8,
-                iterations: test.iterations,
-                blocks: quotient + max(remainder, 1))
-            
-            tests.expect(key.prefix(test.derived.count) ..? test.derived)
+            if  let tests:TestGroup = tests / "pbkdf2-hmac-sha-256" / test.name
+            {
+                let (quotient, remainder):(Int, Int) = test.derived.count.quotientAndRemainder(
+                    dividingBy: SHA256.count)
+                let key:[UInt8] = SHA256.pbkdf2(password: test.password.utf8,
+                    salt: test.salt.utf8,
+                    iterations: test.iterations,
+                    blocks: quotient + max(remainder, 1))
+                
+                tests.expect(key.prefix(test.derived.count) ..? test.derived)
+            }
         }
     }
 }
