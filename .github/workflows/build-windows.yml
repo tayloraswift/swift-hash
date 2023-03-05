@@ -25,6 +25,6 @@ jobs:
             -   name: build 
                 run: |
                     swift --version
-                    swift build -c release Base64
-                    swift build -c release CRC
-                    swift build -c release SHA2
+                    swift build -c release --target Base64
+                    swift build -c release --target CRC
+                    swift build -c release --target SHA2
