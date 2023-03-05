@@ -1,6 +1,6 @@
 <div align="center">
   
-***`hash`***<br>`0.4.4`
+***`hash`***<br>`0.5.0`
   
 [![ci status](https://github.com/kelvin13/swift-hash/actions/workflows/build.yml/badge.svg)](https://github.com/kelvin13/swift-hash/actions/workflows/build.yml)
 [![ci status](https://github.com/kelvin13/swift-hash/actions/workflows/build-devices.yml/badge.svg)](https://github.com/kelvin13/swift-hash/actions/workflows/build-devices.yml)
@@ -37,11 +37,3 @@ This package vends the following library products:
 1.  [`SHA2`](Sources/SHA2)
 
     Implements the [SHA-256](https://en.wikipedia.org/wiki/SHA-2) hashing function.
-
-## unofficial products
-
-This package vends an unofficial product called [`Testing`](Sources/Testing), which contains a unit-testing framework used by this package and a handful of others. At some point it will graduate to its own repository; depending on it in its current state is not recommended!
-
-1.  [`Testing`](Sources/Testing)
-
-    A unit-testing framework.

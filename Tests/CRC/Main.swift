@@ -225,7 +225,11 @@ enum Main:SyncTests
 
       for test:CRC32Test in cases
       {
-            let tests:TestGroup = tests / test.name
+            guard let tests:TestGroup = tests / test.name
+            else
+            {
+               continue
+            }
 
             let computed:CRC32 = .init(hashing: test.message.utf8)
             tests.expect(computed ==? test.expected)

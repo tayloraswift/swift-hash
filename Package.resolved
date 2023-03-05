@@ -1,0 +1,23 @@
+{
+  "pins" : [
+    {
+      "identity" : "swift-atomics",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-atomics.git",
+      "state" : {
+        "revision" : "ff3d2212b6b093db7f177d0855adbc4ef9c5f036",
+        "version" : "1.0.3"
+      }
+    },
+    {
+      "identity" : "swift-grammar",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/kelvin13/swift-grammar",
+      "state" : {
+        "revision" : "69613825b2ad1d0538c59d72e548867ce7568cc2",
+        "version" : "0.3.1"
+      }
+    }
+  ],
+  "version" : 2
+}

@@ -8,46 +8,51 @@ on:
 
 jobs:
     macos-nightly:
-        runs-on: ${{ matrix.os }}
-        name: ${{ matrix.os }} (${{ matrix.swift }})
+        runs-on: ${{ matrix.os.runner }}
+        name: ${{ matrix.os.runner }} (${{ matrix.swift.toolchain }})
         env: 
-            SWIFT_TOOLCHAIN_DIRECTORY: /Library/Developer/Toolchains/swift-${{ matrix.swift }}.xctoolchain
+            SWIFT_TOOLCHAIN_DIRECTORY: /Library/Developer/Toolchains/swift-${{ matrix.swift.toolchain }}.xctoolchain
         strategy:
             matrix:
                 os: 
-                    -   macos-12
+                    -   runner: macos-12
+                        prefix: xcode
                 swift: 
-                    -   DEVELOPMENT-SNAPSHOT-2022-11-11-a
+                    -   toolchain:  5.8-DEVELOPMENT-SNAPSHOT-2023-02-23-a
+                        branch:     swift-5.8-branch
         steps:
             -   uses: actions/checkout@v2
 
             -   name: cache swift toolchains
                 uses: actions/cache@v2
                 with:
-                    path: swift-${{ matrix.swift }}.pkg
-                    key: ${{ matrix.os }}:swift:${{ matrix.swift }}
+                    path: swift-${{ matrix.swift.toolchain }}.pkg
+                    key: ${{ matrix.os.runner }}:swift:${{ matrix.swift.toolchain }}
             
             -   name: cache status
                 id:   cache_status
                 uses: andstor/file-existence-action@v1
                 with:
-                    files: swift-${{ matrix.swift }}.pkg
+                    files: swift-${{ matrix.swift.toolchain }}.pkg
             
             -   name: download swift toolchain 
                 if: steps.cache_status.outputs.files_exists == 'false'
-                run:   "curl https://download.swift.org/development/xcode/\
-                        swift-${{ matrix.swift }}/\
-                        swift-${{ matrix.swift }}-osx.pkg \
-                        --output swift-${{ matrix.swift }}.pkg"
+                run:   "curl https://download.swift.org/\
+                        ${{ matrix.swift.branch }}/\
+                        ${{ matrix.os.prefix }}/\
+                        swift-${{ matrix.swift.toolchain }}/\
+                        swift-${{ matrix.swift.toolchain }}-osx.pkg \
+                        --output swift-${{ matrix.swift.toolchain }}.pkg"
             
             -   name: set up swift
                 run: |
-                    sudo installer -pkg swift-${{ matrix.swift }}.pkg -target /
+                    sudo installer -pkg swift-${{ matrix.swift.toolchain }}.pkg -target /
             
             -   name: build 
                 run: |
                     $SWIFT_TOOLCHAIN_DIRECTORY/usr/bin/swift --version
-                    $SWIFT_TOOLCHAIN_DIRECTORY/usr/bin/swift build
+                    $SWIFT_TOOLCHAIN_DIRECTORY/usr/bin/swift build -c release
+                
             -   name: test
                 run: |
                     $SWIFT_TOOLCHAIN_DIRECTORY/usr/bin/swift run -c release Base64Tests
@@ -61,92 +66,32 @@ jobs:
             matrix:
                 os: 
                     -   macos-12
-                    -   macos-11
         steps:
-            -   uses: actions/checkout@v2
+            -   uses: actions/checkout@v3
 
             -   name: build 
-                run: |
-                    swift --version
-                    swift build
-            -   name: test
-                run: |
-                    swift run -c release Base64Tests
-                    swift run -c release CRCTests
-                    swift run -c release SHA2Tests
+                run: .github/pipeline
     
     linux:
-        runs-on: ${{ matrix.os.runner }}
-        name: ${{ matrix.os.runner }} (${{ matrix.swift.toolchain }})
+        runs-on: ubuntu-22.04
+        name: ${{ matrix.image }}
+
         strategy:
             matrix:
-                os: 
-                    -   runner: ubuntu-22.04
-                        prefix: ubuntu2204
-                        suffix: ubuntu22.04
-                    -   runner: ubuntu-20.04
-                        prefix: ubuntu2004
-                        suffix: ubuntu20.04
-                swift: 
-                    -   toolchain:  DEVELOPMENT-SNAPSHOT-2022-11-11-a
-                        branch:     development
-                include:
-                    -   os: 
-                            runner: ubuntu-20.04
-                            prefix: ubuntu2004
-                            suffix: ubuntu20.04
-                        swift: 
-                            toolchain:  5.7.1-RELEASE
-                            branch:     swift-5.7.1-release
-                    -   os: 
-                            runner: ubuntu-20.04
-                            prefix: ubuntu2004
-                            suffix: ubuntu20.04
-                        swift: 
-                            toolchain:  5.6.2-RELEASE
-                            branch:     swift-5.6.2-release
-                    -   os: 
-                            runner: ubuntu-20.04
-                            prefix: ubuntu2004
-                            suffix: ubuntu20.04
-                        swift: 
-                            toolchain:  5.5.3-RELEASE
-                            branch:     swift-5.5.3-release
+                image:
+                -   swiftlang/swift:nightly-5.8-amazonlinux2
+                -   swiftlang/swift:nightly-5.8-jammy
+                -   swift:5.7.3-amazonlinux2
+                -   swift:5.7.3-jammy
         steps:
-            -   uses: actions/checkout@v2
+            -   name: checkout repository
+                uses: actions/checkout@v3
             
-            -   name: cache swift toolchains
-                uses: actions/cache@v2
-                with:
-                    path: swift-${{ matrix.swift.toolchain }}.tar.gz
-                    key: ${{ matrix.os.runner }}:swift:${{ matrix.swift.toolchain }}
-                    
-            -   name: cache status
-                id:   cache_status
-                uses: andstor/file-existence-action@v1
-                with:
-                    files: swift-${{ matrix.swift.toolchain }}.tar.gz
-            
-            -   name: download swift toolchain 
-                if: steps.cache_status.outputs.files_exists == 'false'
-                run:   "curl https://download.swift.org/\
-                        ${{ matrix.swift.branch }}/\
-                        ${{ matrix.os.prefix }}/\
-                        swift-${{ matrix.swift.toolchain }}/\
-                        swift-${{ matrix.swift.toolchain }}-${{ matrix.os.suffix }}.tar.gz \
-                        --output swift-${{ matrix.swift.toolchain }}.tar.gz"
-            
-            -   name: set up swift
+            -   name: build and test
                 run: |
-                    mkdir -p $GITHUB_WORKSPACE/swift-${{ matrix.swift.toolchain }}
-                    tar -xzf swift-${{ matrix.swift.toolchain }}.tar.gz -C $GITHUB_WORKSPACE/swift-${{ matrix.swift.toolchain }} --strip 1
-                    echo "$GITHUB_WORKSPACE/swift-${{ matrix.swift.toolchain }}/usr/bin" >> $GITHUB_PATH
-            -   name: build
-                run: |
-                    swift --version
-                    swift build 
-            -   name: test
-                run: |
-                    swift run -c release Base64Tests
-                    swift run -c release CRCTests
-                    swift run -c release SHA2Tests
+                    docker run -t --rm \
+                        --name swift-environment \
+                        -v $PWD:/swift-hash \
+                        -w /swift-hash \
+                        ${{ matrix.image }} \
+                        /bin/bash $(echo .github/pipeline)

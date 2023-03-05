@@ -111,15 +111,25 @@ enum Main:SyncTests
                 expected: "light w"),
         ]
 
-        for (tests, cases):(TestGroup, [Base64Test]) in
+        for (tests, cases):(TestGroup?, [Base64Test]) in
         [
             (tests / "binary", binary),
             (tests / "string", string),
         ]
         {
+            guard let tests:TestGroup
+            else
+            {
+                continue
+            }
+
             for test:Base64Test in cases
             {
-                let tests:TestGroup = tests / test.name
+                guard let tests:TestGroup = tests / test.name
+                else
+                {
+                    continue
+                }
 
                 tests.expect(Base64.decode(test.canonical.utf8, to: [UInt8].self) ..?
                     test.expected)
