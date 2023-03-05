@@ -25,10 +25,6 @@ jobs:
             -   name: build 
                 run: |
                     swift --version
-                    swift build
-            -   name: test 
-                run: |
-                    swift --version
                     swift build -c release Base64
                     swift build -c release CRC
                     swift build -c release SHA2
