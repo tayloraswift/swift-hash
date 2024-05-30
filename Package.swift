@@ -52,23 +52,20 @@ let package:Package = .init(
             [
                 .product(name: "Testing_", package: "swift-grammar"),
                 .target(name: "Base64"),
-            ],
-            path: "Tests/Base64"),
+            ]),
 
         .executableTarget(name: "CRCTests",
             dependencies:
             [
                 .product(name: "Testing_", package: "swift-grammar"),
                 .target(name: "CRC"),
-            ],
-            path: "Tests/CRC"),
+            ]),
 
         .executableTarget(name: "SHA2Tests",
             dependencies:
             [
                 .product(name: "Testing_", package: "swift-grammar"),
                 .target(name: "SHA2"),
-            ],
-            path: "Tests/SHA2"),
+            ]),
     ]
 )
