@@ -1,7 +1,7 @@
 import Base64
-import Testing
+import Testing_
 
-@main 
+@main
 enum Main:SyncTests
 {
     static
@@ -56,55 +56,55 @@ enum Main:SyncTests
             .init(name: "empty",
                 canonical: "",
                 expected: ""),
-            
+
             .init(name: "single",
                 degenerate: "YQ",
                 canonical: "YQ==",
                 expected: "a"),
-            
+
             .init(name: "double",
                 degenerate: "YWI",
                 canonical: "YWI=",
                 expected: "ab"),
-            
+
             .init(name: "triple",
                 canonical: "YWJj",
                 expected: "abc"),
-            
+
             .init(name: "basic",
                 canonical: "TWFueSBoYW5kcyBtYWtlIGxpZ2h0IHdvcmsu",
                 expected: "Many hands make light work."),
-            
+
             .init(name: "whitespace",
-                degenerate: 
+                degenerate:
                 """
                 T\u{0C}WFueSBoY W5kc\ryBtYWt\tlIGxpZ2
                 h0IHd
-                
-                vcmsu 
+
+                vcmsu
                 """,
                 canonical: "TWFueSBoYW5kcyBtYWtlIGxpZ2h0IHdvcmsu",
                 expected: "Many hands make light work."),
-            
+
             .init(name: "padding-11-16",
                 degenerate: "bGlnaHQgd29yay4",
                 canonical: "bGlnaHQgd29yay4=",
                 expected: "light work."),
-            
+
             .init(name: "padding-10-16",
                 degenerate: "bGlnaHQgd29yaw",
                 canonical: "bGlnaHQgd29yaw==",
                 expected: "light work"),
-            
+
             .init(name: "padding-9-12",
                 canonical: "bGlnaHQgd29y",
                 expected: "light wor"),
-            
+
             .init(name: "padding-8-12",
                 degenerate: "bGlnaHQgd28",
                 canonical: "bGlnaHQgd28=",
                 expected: "light wo"),
-            
+
             .init(name: "padding-7-12",
                 degenerate: "bGlnaHQgdw",
                 canonical: "bGlnaHQgdw==",
