@@ -77,7 +77,7 @@ extension Base64
 }
 extension Base64.Digits:BaseDigits
 {
-    @inlinable public static 
+    @inlinable public static
     subscript(remainder:UInt8) -> UInt8
     {
         Self.ascii[Int.init(remainder & 0b0011_1111)]

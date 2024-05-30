@@ -14,7 +14,7 @@ struct MessageAuthenticationKey<Hash> where Hash:MessageAuthenticationHash
 
     /// Creates a message authentication key from the given base key.
     @inlinable public
-    init<Key>(_ key:Key) where Key:Collection, Key.Element == UInt8 
+    init<Key>(_ key:Key) where Key:Collection, Key.Element == UInt8
     {
         let normalized:[UInt8]
         let count:Int = key.count
@@ -27,11 +27,11 @@ struct MessageAuthenticationKey<Hash> where Hash:MessageAuthenticationHash
         {
             normalized = [UInt8].init(key) + repeatElement(0, count: Hash.stride - count)
         }
-        else 
+        else
         {
             normalized = [UInt8].init(key)
         }
-        
+
         self.inner = normalized.map { $0 ^ 0x36 }
         self.outer = normalized.map { $0 ^ 0x5c }
     }
@@ -63,7 +63,7 @@ extension MessageAuthenticationKey
 
             var hash:Hash = self.authenticate(salt)
             var block:[UInt8] = .init(hash)
-            
+
             for _ in 1 ..< iterations
             {
                 hash = self.authenticate(hash)
@@ -72,7 +72,7 @@ extension MessageAuthenticationKey
                     block[index] ^= byte
                 }
             }
-        
+
             output.append(contentsOf: block)
         }
         return output
