@@ -9,7 +9,7 @@ struct Base64Test
 
     init(name:String,
         degenerate:String? = nil,
-        canonical:String, 
+        canonical:String,
         expected:[UInt8])
     {
         self.name = name
@@ -22,7 +22,7 @@ extension Base64Test
 {
     init<UTF8>(name:String,
         degenerate:String? = nil,
-        canonical:String, 
+        canonical:String,
         expected:UTF8) where UTF8:Collection, UTF8.Element == UInt8
     {
         self.init(name: name,
@@ -32,7 +32,7 @@ extension Base64Test
     }
     init(name:String,
         degenerate:String? = nil,
-        canonical:String, 
+        canonical:String,
         expected:String)
     {
         self.init(name: name,

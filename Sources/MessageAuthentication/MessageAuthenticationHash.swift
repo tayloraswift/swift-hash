@@ -12,7 +12,7 @@ protocol MessageAuthenticationHash:RandomAccessCollection where Index == Int, El
 
     /// Computes an instance of this hash for the given message.
     init<Message>(hashing message:Message)
-        where Message:Collection, Message.Element == UInt8 
+        where Message:Collection, Message.Element == UInt8
 }
 extension MessageAuthenticationHash
 {
@@ -40,7 +40,7 @@ extension MessageAuthenticationHash
     @inlinable public
     init<Message, Key>(authenticating message:Message, key:Key)
         where   Message:Sequence, Message.Element == UInt8,
-                Key:Collection, Key.Element == UInt8 
+                Key:Collection, Key.Element == UInt8
     {
         let key:MessageAuthenticationKey<Self> = .init(key)
         self = key.authenticate(message)

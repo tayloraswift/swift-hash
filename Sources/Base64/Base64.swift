@@ -2,7 +2,7 @@ import BaseDigits
 
 /// A namespace for base-64 utilities.
 public
-enum Base64 
+enum Base64
 {
     /// Decodes some ``String``-like type containing an ASCII-encoded base-64 string
     /// to some ``RangeReplaceableCollection`` type. Padding is not required.
@@ -15,7 +15,7 @@ enum Base64
     ///     This function uses the size of the input string to provide a capacity hint
     ///     for its output, and may over-allocate storage if the input contains many
     ///     non-digit characters.
-    @inlinable public static 
+    @inlinable public static
     func decode<ASCII, Bytes>(_ ascii:ASCII, to _:Bytes.Type = Bytes.self) -> Bytes
         where   Bytes:RangeReplaceableCollection, Bytes.Element == UInt8,
                 ASCII:StringProtocol
@@ -33,7 +33,7 @@ enum Base64
     ///     This function uses the size of the input string to provide a capacity hint
     ///     for its output, and may over-allocate storage if the input contains many
     ///     non-digit characters.
-    @inlinable public static 
+    @inlinable public static
     func decode<ASCII, Bytes>(_ ascii:ASCII, to _:Bytes.Type = Bytes.self) -> Bytes
         where   Bytes:RangeReplaceableCollection, Bytes.Element == UInt8,
                 ASCII:Sequence, ASCII.Element == UInt8
@@ -67,7 +67,7 @@ enum Base64
     }
 
     /// Encodes a sequence of bytes to a base-64 string with padding if needed.
-    @inlinable public static 
+    @inlinable public static
     func encode<Bytes>(_ bytes:Bytes) -> String where Bytes:Sequence, Bytes.Element == UInt8
     {
         var encoded:String = ""
@@ -77,28 +77,28 @@ enum Base64
         {
             encoded.append(    Digits[first  >> 2])
 
-            guard let second:UInt8 = bytes.next() 
-            else 
+            guard let second:UInt8 = bytes.next()
+            else
             {
                 encoded.append(Digits[first  << 4])
                 encoded.append("=")
                 encoded.append("=")
-                continue 
+                continue
             }
-            
+
             encoded.append(    Digits[first  << 4 | second >> 4])
 
-            guard let third:UInt8 = bytes.next() 
-            else 
+            guard let third:UInt8 = bytes.next()
+            else
             {
                 encoded.append(Digits[second << 2])
                 encoded.append("=")
-                continue 
+                continue
             }
-            
+
             encoded.append(    Digits[second << 2 | third  >> 6])
             encoded.append(    Digits[third])
         }
-        return encoded 
+        return encoded
     }
 }

@@ -25,7 +25,7 @@ extension Base16.Values:Sequence, IteratorProtocol
     {
         while let digit:UInt8 = self.iterator.next()
         {
-            switch digit 
+            switch digit
             {
             case 0x30 ... 0x39: return digit      - 0x30
             case 0x61 ... 0x66: return digit + 10 - 0x61

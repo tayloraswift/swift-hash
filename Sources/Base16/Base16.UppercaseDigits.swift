@@ -9,7 +9,7 @@ extension Base16
 }
 extension Base16.UppercaseDigits:BaseDigits
 {
-    @inlinable public static 
+    @inlinable public static
     subscript(remainder:UInt8) -> UInt8
     {
         (remainder < 10 ? 0x30 : 0x41 - 10) &+ remainder
