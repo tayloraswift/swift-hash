@@ -2,10 +2,10 @@ import CRC
 import Testing_
 
 @main
-enum Main:SyncTests
+enum Main:TestMain, TestBattery
 {
    static
-   func run(tests:Tests)
+   func run(tests:TestGroup)
    {
       // https://www.rfc-editor.org/rfc/rfc3720#appendix-B.4
       let cases:[CRC32Test] =
