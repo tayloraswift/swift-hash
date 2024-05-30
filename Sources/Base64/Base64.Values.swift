@@ -1,10 +1,10 @@
-extension Base64 
+extension Base64
 {
     /// An abstraction over text input, which discards characters that are not
     /// valid base-64 digits.
     ///
     /// Iteration over an instance of this type will halt upon encountering the
-    /// first [`'='`]() padding character, even if the underlying sequence contains
+    /// first `'='` padding character, even if the underlying sequence contains
     /// more characters.
     @frozen public
     struct Values<ASCII> where ASCII:Sequence, ASCII.Element == UInt8
