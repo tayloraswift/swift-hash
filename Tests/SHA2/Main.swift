@@ -1,6 +1,6 @@
 import Base16
 import SHA2
-import Testing
+import Testing_
 
 @main
 enum Main:SyncTests
@@ -12,13 +12,13 @@ enum Main:SyncTests
         for test:MessageAuthenticationTest in
         [
             .init(name: "1",
-                key: 
+                key:
                 """
                 0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b
                 0b0b0b0b
                 """,
                 message: "4869205468657265",
-                hmac256: 
+                hmac256:
                 """
                 b0344c61d8db38535ca8afceaf0bf12b
                 881dc200c9833da726e9376c2e32cff7
@@ -27,12 +27,12 @@ enum Main:SyncTests
 
             .init(name: "2",
                 key: "4a656665",
-                message: 
+                message:
                 """
                 7768617420646f2079612077616e7420
                 666f72206e6f7468696e673f
                 """,
-                hmac256: 
+                hmac256:
                 """
                 5bdcc146bf60754e6a042426089575c7
                 5a003f089d2739839dec58b964ec3843
@@ -40,12 +40,12 @@ enum Main:SyncTests
             ),
 
             .init(name: "3",
-                key: 
+                key:
                 """
                 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                 aaaaaaaa
                 """,
-                message: 
+                message:
                 """
                 dddddddddddddddddddddddddddddddd
                 dddddddddddddddddddddddddddddddd
@@ -60,7 +60,7 @@ enum Main:SyncTests
             ),
 
             .init(name: "4",
-                key: 
+                key:
                 """
                 0102030405060708090a0b0c0d0e0f10
                 111213141516171819
@@ -80,7 +80,7 @@ enum Main:SyncTests
             ),
 
             .init(name: "5",
-                key: 
+                key:
                 """
                 0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c
                 0c0c0c0c
@@ -98,7 +98,7 @@ enum Main:SyncTests
             ),
 
             .init(name: "6",
-                key: 
+                key:
                 """
                 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
@@ -125,7 +125,7 @@ enum Main:SyncTests
             ),
 
             .init(name: "7",
-                key: 
+                key:
                 """
                 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
@@ -162,7 +162,7 @@ enum Main:SyncTests
             {
                 let key:[UInt8] = Base16.decode(test.key.utf8)
                 let message:[UInt8] = Base16.decode(test.message.utf8)
-                
+
                 let computed:SHA256 = .init(authenticating: message, key: key)
                 tests.expect(computed ==? test.expected)
             }
@@ -171,7 +171,7 @@ enum Main:SyncTests
         // https://stackoverflow.com/questions/5130513/pbkdf2-hmac-sha2-test-vectors
         for test:KeyDerivationTest in
         [
-            .init(name: "single-iteration", 
+            .init(name: "single-iteration",
                 password: "password", salt: "salt", iterations: 1,
                 derived:
                 [
@@ -180,7 +180,7 @@ enum Main:SyncTests
                     0xa8, 0x65, 0x48, 0xc9, 0x2c, 0xcc, 0x35, 0x48,
                     0x08, 0x05, 0x98, 0x7c, 0xb7, 0x0b, 0xe1, 0x7b,
                 ]),
-            
+
             .init(name: "multiple-iterations",
                 password: "password", salt: "salt", iterations: 2,
                 derived:
@@ -190,7 +190,7 @@ enum Main:SyncTests
                     0x2a, 0x30, 0x3f, 0x8e, 0xf3, 0xc2, 0x51, 0xdf,
                     0xd6, 0xe2, 0xd8, 0x5a, 0x95, 0x47, 0x4c, 0x43,
                 ]),
-            
+
             .init(name: "many-iterations",
                 password: "password", salt: "salt", iterations: 4096,
                 derived:
@@ -200,9 +200,9 @@ enum Main:SyncTests
                     0x96, 0x28, 0x93, 0xa0, 0x01, 0xce, 0x4e, 0x11,
                     0xa4, 0x96, 0x38, 0x73, 0xaa, 0x98, 0x13, 0x4a,
                 ]),
-            
+
             // disabled to keep the CI flowing
-            
+
             // $0.test(case: KeyDerivationTest.init(name: "absurd-iterations",
             //     password: "password", salt: "salt", iterations: 16777216,
             //     derived:
@@ -212,7 +212,7 @@ enum Main:SyncTests
             //         0xf7, 0xf1, 0x79, 0xe8, 0x9b, 0x3b, 0x0b, 0xcb,
             //         0x17, 0xad, 0x10, 0xe3, 0xac, 0x6e, 0xba, 0x46,
             //     ]))
-            
+
             .init(name: "multiple-blocks",
                 password: "passwordPASSWORDpassword",
                 salt: "saltSALTsaltSALTsaltSALTsaltSALTsalt",
@@ -225,7 +225,7 @@ enum Main:SyncTests
                     0x1c, 0x4e, 0x2a, 0x1f, 0xb8, 0xdd, 0x53, 0xe1,
                     0xc6, 0x35, 0x51, 0x8c, 0x7d, 0xac, 0x47, 0xe9,
                 ]),
-            
+
             .init(name: "null-bytes",
                 password: "pass\u{0}word", salt: "sa\u{0}lt",
                 iterations: 4096,
@@ -244,7 +244,7 @@ enum Main:SyncTests
                     salt: test.salt.utf8,
                     iterations: test.iterations,
                     blocks: quotient + max(remainder, 1))
-                
+
                 tests.expect(key.prefix(test.derived.count) ..? test.derived)
             }
         }

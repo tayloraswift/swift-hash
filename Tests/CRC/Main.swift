@@ -1,7 +1,7 @@
 import CRC
-import Testing
+import Testing_
 
-@main 
+@main
 enum Main:SyncTests
 {
    static
@@ -12,11 +12,11 @@ enum Main:SyncTests
       [
          .init(name: "basic", message: "123456789",
             expected: 0xcb_f4_39_26),
-         
+
          .init(name: "apache-license",
          message:
             """
-            
+
                                              Apache License
                                        Version 2.0, January 2004
                                     http://www.apache.org/licenses/
@@ -218,7 +218,7 @@ enum Main:SyncTests
                WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
                See the License for the specific language governing permissions and
                limitations under the License.
-            
+
             """,
          expected: 0xaf_fb_88_44),
       ]

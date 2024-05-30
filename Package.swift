@@ -11,62 +11,62 @@ let package:Package = .init(
         .library(name: "MessageAuthentication", targets: ["MessageAuthentication"]),
         .library(name: "SHA2",                  targets: ["SHA2"]),
     ],
-    dependencies: 
+    dependencies:
     [
-        .package(url: "https://github.com/kelvin13/swift-grammar", .upToNextMinor(
-            from: "0.3.1")),
+        .package(url: "https://github.com/tayloraswift/swift-grammar", .upToNextMinor(
+            from: "0.4.0")),
     ],
     targets:
     [
         .target(name: "BaseDigits"),
 
-        .target(name: "Base16", 
-            dependencies: 
+        .target(name: "Base16",
+            dependencies:
             [
                 .target(name: "BaseDigits"),
             ]),
 
-        .target(name: "Base64", 
-            dependencies: 
+        .target(name: "Base64",
+            dependencies:
             [
                 .target(name: "BaseDigits"),
             ]),
 
-        .target(name: "CRC", 
-            dependencies: 
+        .target(name: "CRC",
+            dependencies:
             [
                 .target(name: "Base16"),
             ]),
-        
+
         .target(name: "MessageAuthentication"),
 
-        .target(name: "SHA2", 
-            dependencies: 
+        .target(name: "SHA2",
+            dependencies:
             [
                 .target(name: "Base16"),
                 .target(name: "MessageAuthentication"),
             ]),
 
-        .executableTarget(name: "Base64Tests", 
-            dependencies: 
+        .executableTarget(name: "Base64Tests",
+            dependencies:
             [
-                .product(name: "Testing", package: "swift-grammar"),
+                .product(name: "Testing_", package: "swift-grammar"),
                 .target(name: "Base64"),
             ],
             path: "Tests/Base64"),
-        
-        .executableTarget(name: "CRCTests", 
-            dependencies: 
+
+        .executableTarget(name: "CRCTests",
+            dependencies:
             [
-                .product(name: "Testing", package: "swift-grammar"),
+                .product(name: "Testing_", package: "swift-grammar"),
                 .target(name: "CRC"),
             ],
             path: "Tests/CRC"),
-        
-        .executableTarget(name: "SHA2Tests", 
-            dependencies: 
+
+        .executableTarget(name: "SHA2Tests",
+            dependencies:
             [
-                .product(name: "Testing", package: "swift-grammar"),
+                .product(name: "Testing_", package: "swift-grammar"),
                 .target(name: "SHA2"),
             ],
             path: "Tests/SHA2"),
