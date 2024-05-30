@@ -2,10 +2,10 @@ import Base64
 import Testing_
 
 @main
-enum Main:SyncTests
+enum Main:TestMain, TestBattery
 {
     static
-    func run(tests:Tests)
+    func run(tests:TestGroup)
     {
         let binary:[Base64Test] =
         [

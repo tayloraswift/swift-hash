@@ -3,10 +3,10 @@ import SHA2
 import Testing_
 
 @main
-enum Main:SyncTests
+enum Main:TestMain, TestBattery
 {
     static
-    func run(tests:Tests)
+    func run(tests:TestGroup)
     {
         // https://datatracker.ietf.org/doc/html/rfc4231
         for test:MessageAuthenticationTest in
