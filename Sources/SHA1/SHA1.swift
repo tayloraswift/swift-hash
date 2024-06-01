@@ -92,7 +92,7 @@ extension SHA1
 {
     @available(*, unavailable, message: "unimplemented")
     @inlinable public
-    init<Message>(hashing message:__shared Message) where Message:Collection<UInt8>
+    init(hashing message:__shared some Collection<UInt8>)
     {
         fatalError()
     }

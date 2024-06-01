@@ -1,11 +1,7 @@
 import Base16
 
-#if swift(>=5.5)
-extension CRC32:Sendable {}
-#endif
-
 @frozen public
-struct CRC32:Hashable
+struct CRC32:Hashable, Sendable
 {
     public static
     let table:[UInt32] = (0 ..< 256).map
@@ -23,24 +19,21 @@ struct CRC32:Hashable
         self.checksum = checksum
     }
     @inlinable public
-    init<Message>(hashing message:Message)
-        where Message:Sequence, Message.Element == UInt8
+    init(hashing message:some Sequence<UInt8>)
     {
         self.init()
         self.update(with: message)
     }
 
     @inlinable public
-    func updated<Message>(with message:Message) -> Self
-        where Message:Sequence, Message.Element == UInt8
+    func updated(with message:some Sequence<UInt8>) -> Self
     {
         var checksum:Self = self
         checksum.update(with: message)
         return checksum
     }
     @inlinable public mutating
-    func update<Message>(with message:Message)
-        where Message:Sequence, Message.Element == UInt8
+    func update(with message:some Sequence<UInt8>)
     {
         self.checksum = ~message.reduce(~self.checksum)
         {

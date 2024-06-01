@@ -7,7 +7,7 @@ protocol BaseDigits
 }
 extension BaseDigits
 {
-    /// Gets the ASCII value for the given remainder as a ``Unicode/Scalar``.
+    /// Gets the ASCII value for the given remainder as a ``Unicode.Scalar``.
     @inlinable public static
     subscript(remainder:UInt8, as _:Unicode.Scalar.Type = Unicode.Scalar.self) -> Unicode.Scalar
     {

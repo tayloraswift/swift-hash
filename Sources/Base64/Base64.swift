@@ -16,9 +16,8 @@ enum Base64
     ///     for its output, and may over-allocate storage if the input contains many
     ///     non-digit characters.
     @inlinable public static
-    func decode<ASCII, Bytes>(_ ascii:ASCII, to _:Bytes.Type = Bytes.self) -> Bytes
-        where   Bytes:RangeReplaceableCollection, Bytes.Element == UInt8,
-                ASCII:StringProtocol
+    func decode<Bytes>(_ ascii:some StringProtocol, to _:Bytes.Type = Bytes.self) -> Bytes
+        where Bytes:RangeReplaceableCollection<UInt8>
     {
         self.decode(ascii.utf8, to: Bytes.self)
     }
@@ -35,8 +34,7 @@ enum Base64
     ///     non-digit characters.
     @inlinable public static
     func decode<ASCII, Bytes>(_ ascii:ASCII, to _:Bytes.Type = Bytes.self) -> Bytes
-        where   Bytes:RangeReplaceableCollection, Bytes.Element == UInt8,
-                ASCII:Sequence, ASCII.Element == UInt8
+        where Bytes:RangeReplaceableCollection<UInt8>, ASCII:Sequence<UInt8>
     {
         // https://en.wikipedia.org/wiki/Base64
         var values:Values<ASCII> = .init(ascii),
@@ -68,7 +66,7 @@ enum Base64
 
     /// Encodes a sequence of bytes to a base-64 string with padding if needed.
     @inlinable public static
-    func encode<Bytes>(_ bytes:Bytes) -> String where Bytes:Sequence, Bytes.Element == UInt8
+    func encode<Bytes>(_ bytes:Bytes) -> String where Bytes:Sequence<UInt8>
     {
         var encoded:String = ""
             encoded.reserveCapacity(bytes.underestimatedCount * 4 / 3)

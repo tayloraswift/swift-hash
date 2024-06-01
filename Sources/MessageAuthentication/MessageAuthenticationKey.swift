@@ -14,7 +14,7 @@ struct MessageAuthenticationKey<Hash> where Hash:MessageAuthenticationHash
 
     /// Creates a message authentication key from the given base key.
     @inlinable public
-    init<Key>(_ key:Key) where Key:Collection, Key.Element == UInt8
+    init(_ key:some Collection<UInt8>)
     {
         let normalized:[UInt8]
         let count:Int = key.count
@@ -42,8 +42,7 @@ extension MessageAuthenticationKey
     /// ([HMAC](https://en.wikipedia.org/wiki/HMAC)) for the given message
     /// using this key.
     @inlinable public
-    func authenticate<Message>(_ message:Message) -> Hash
-        where Message:Sequence, Message.Element == UInt8
+    func authenticate(_ message:some Sequence<UInt8>) -> Hash
     {
         .init(hashing: outer + Hash.init(hashing: inner + message))
     }
@@ -52,8 +51,7 @@ extension MessageAuthenticationKey
     /// a password, then this functions as a password-based key derivation
     /// function ([PBKDR2](https://en.wikipedia.org/wiki/PBKDF2)).
     @inlinable public
-    func derive<Salt>(salt:Salt, iterations:Int, blocks:Int = 1) -> [UInt8]
-        where Salt:Collection, Salt.Element == UInt8
+    func derive(salt:some Collection<UInt8>, iterations:Int, blocks:Int = 1) -> [UInt8]
     {
         var output:[UInt8] = []
             output.reserveCapacity(blocks * Hash.count)
