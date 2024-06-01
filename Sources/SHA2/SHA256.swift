@@ -1,12 +1,8 @@
 import Base16
 import MessageAuthentication
 
-#if swift(>=5.5)
-extension SHA256:Sendable {}
-#endif
-
 @frozen public
-struct SHA256
+struct SHA256:Sendable
 {
     public
     typealias Words = (UInt32, UInt32, UInt32, UInt32, UInt32, UInt32, UInt32, UInt32)
@@ -52,8 +48,7 @@ struct SHA256
     }
 
     @inlinable public
-    init<Message>(hashing message:Message)
-        where Message:Collection, Message.Element == UInt8
+    init<Message>(hashing message:Message) where Message:Collection<UInt8>
     {
         self.init()
 
@@ -95,8 +90,7 @@ struct SHA256
     }
 
     @inlinable public mutating
-    func update<Chunk>(with chunk:Chunk)
-        where Chunk:Collection, Chunk.Element == UInt8
+    func update<Chunk>(with chunk:Chunk) where Chunk:Collection<UInt8>
     {
         assert(chunk.count == 64)
 
@@ -237,25 +231,14 @@ extension SHA256:MessageAuthenticationHash
 extension SHA256:ExpressibleByStringLiteral
 {
     @inlinable public
-    init?<ASCII>(parsing ascii:ASCII) where ASCII:Sequence, ASCII.Element == UInt8
+    init?(parsing ascii:some Sequence<UInt8>)
     {
-        #if swift(>=5.6)
         guard let words:Words = Base16.decode(ascii, loading: Words.self)
         else
         {
             return nil
         }
-        #else
-        var words:Words = (0, 0, 0, 0, 0, 0, 0, 0)
-        guard let _:Void = withUnsafeMutableBytes(of: &words,
-        {
-            return Base16.decode(ascii, into: $0)
-        })
-        else
-        {
-            return nil
-        }
-        #endif
+
         self.init(words:
         (
             .init(bigEndian: words.0),

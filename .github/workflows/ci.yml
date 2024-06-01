@@ -44,6 +44,10 @@ jobs:
                     swift --version
                     xcrun xcodebuild build -scheme "CRC" -destination \
                         "generic/platform=ios"
+                    xcrun xcodebuild build -scheme "MD5" -destination \
+                        "generic/platform=ios"
+                    xcrun xcodebuild build -scheme "SHA1" -destination \
+                        "generic/platform=ios"
                     xcrun xcodebuild build -scheme "SHA2" -destination \
                         "generic/platform=ios"
                     xcrun xcodebuild build -scheme "Base64" -destination \
@@ -54,6 +58,10 @@ jobs:
                     swift --version
                     xcrun xcodebuild build -scheme "CRC" -destination \
                         "generic/platform=tvos"
+                    xcrun xcodebuild build -scheme "MD5" -destination \
+                        "generic/platform=tvos"
+                    xcrun xcodebuild build -scheme "SHA1" -destination \
+                        "generic/platform=tvos"
                     xcrun xcodebuild build -scheme "SHA2" -destination \
                         "generic/platform=tvos"
                     xcrun xcodebuild build -scheme "Base64" -destination \
@@ -63,6 +71,10 @@ jobs:
                 run: |
                     swift --version
                     xcrun xcodebuild build -scheme "CRC" -destination \
+                        "generic/platform=watchos"
+                    xcrun xcodebuild build -scheme "MD5" -destination \
+                        "generic/platform=watchos"
+                    xcrun xcodebuild build -scheme "SHA1" -destination \
                         "generic/platform=watchos"
                     xcrun xcodebuild build -scheme "SHA2" -destination \
                         "generic/platform=watchos"

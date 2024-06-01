@@ -7,7 +7,7 @@ extension Base64
     /// first `'='` padding character, even if the underlying sequence contains
     /// more characters.
     @frozen public
-    struct Values<ASCII> where ASCII:Sequence, ASCII.Element == UInt8
+    struct Values<ASCII> where ASCII:Sequence<UInt8>
     {
         public
         var iterator:ASCII.Iterator

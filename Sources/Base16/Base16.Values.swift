@@ -3,7 +3,7 @@ extension Base16
     /// An abstraction over text input, which discards characters that are not
     /// valid base-16 digits.
     public
-    struct Values<ASCII> where ASCII:Sequence, ASCII.Element == UInt8
+    struct Values<ASCII> where ASCII:Sequence<UInt8>
     {
         public
         var iterator:ASCII.Iterator

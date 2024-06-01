@@ -18,9 +18,8 @@ enum Base16
     ///     for its output, and may over-allocate storage if the input contains many
     ///     non-digit characters.
     @inlinable public static
-    func decode<ASCII, Bytes>(_ ascii:ASCII, to _:Bytes.Type = Bytes.self) -> Bytes
-        where   Bytes:RangeReplaceableCollection, Bytes.Element == UInt8,
-                ASCII:StringProtocol
+    func decode<Bytes>(_ ascii:some StringProtocol, to _:Bytes.Type = Bytes.self) -> Bytes
+        where Bytes:RangeReplaceableCollection<UInt8>
     {
         self.decode(ascii.utf8, to: Bytes.self)
     }
@@ -38,8 +37,7 @@ enum Base16
     ///     non-digit characters.
     @inlinable public static
     func decode<ASCII, Bytes>(_ ascii:ASCII, to _:Bytes.Type = Bytes.self) -> Bytes
-        where   Bytes:RangeReplaceableCollection, Bytes.Element == UInt8,
-                ASCII:Sequence, ASCII.Element == UInt8
+        where Bytes:RangeReplaceableCollection<UInt8>, ASCII:Sequence<UInt8>
     {
         var bytes:Bytes = .init()
             bytes.reserveCapacity(ascii.underestimatedCount / 2)
@@ -53,8 +51,8 @@ enum Base16
     }
     /// Encodes a sequence of bytes to a base-16 string with the specified lettercasing.
     @inlinable public static
-    func encode<Bytes, Digits>(_ bytes:Bytes, with _:Digits.Type) -> String
-        where Bytes:Sequence, Bytes.Element == UInt8, Digits:BaseDigits
+    func encode<Digits>(_ bytes:some Sequence<UInt8>, with _:Digits.Type) -> String
+        where Digits:BaseDigits
     {
         var encoded:String = ""
             encoded.reserveCapacity(bytes.underestimatedCount * 2)
@@ -75,9 +73,8 @@ extension Base16
     /// Characters (including UTF-8 continuation bytes) that are not base-16 digits
     /// will be skipped.
     @inlinable public static
-    func decode<ASCII>(_ ascii:ASCII,
-        into bytes:UnsafeMutableRawBufferPointer) -> Void?
-        where ASCII:Sequence, ASCII.Element == UInt8
+    func decode<ASCII>(_ ascii:ASCII, into bytes:UnsafeMutableRawBufferPointer) -> Void?
+        where ASCII:Sequence<UInt8>
     {
         var values:Values<ASCII> = .init(ascii)
         for offset:Int in bytes.indices
@@ -122,14 +119,12 @@ extension Base16
 }
 extension Base16
 {
-    #if swift(>=5.6)
     /// Decodes an ASCII-encoded base-16 string to some (usually trivial) type.
     /// This is essentially the same as loading values from raw memory, so this
     /// method should only be used to load trivial types.
     @inlinable public static
-    func decode<ASCII, BigEndian>(_ ascii:ASCII,
+    func decode<BigEndian>(_ ascii:some Sequence<UInt8>,
         loading _:BigEndian.Type = BigEndian.self) -> BigEndian?
-        where ASCII:Sequence, ASCII.Element == UInt8
     {
         withUnsafeTemporaryAllocation(
             byteCount: MemoryLayout<BigEndian>.size,
@@ -146,15 +141,6 @@ extension Base16
             }
         }
     }
-    #else
-    @available(*, unavailable) public static
-    func decode<ASCII, BigEndian>(_ ascii:ASCII,
-        loading _:BigEndian.Type = BigEndian.self) -> BigEndian?
-        where ASCII:Sequence, ASCII.Element == UInt8
-    {
-        fatalError()
-    }
-    #endif
 
     /// Encodes the raw bytes of the given value to a base-16 string with the
     /// specified lettercasing. The bytes with the lowest addresses appear first
@@ -182,7 +168,7 @@ extension Base16
         }
         #endif
 
-        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS) || swift(<5.4)
+        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         return .init(
             decoding: [UInt8].init(unsafeUninitializedCapacity: bytes)
             {

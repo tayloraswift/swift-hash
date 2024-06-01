@@ -1,6 +1,6 @@
 <div align="center">
 
-***`hash`***<br>`0.5`
+***`hash`***<br>`0.6`
 
 [![ci status](https://github.com/tayloraswift/swift-hash/actions/workflows/ci.yml/badge.svg)](https://github.com/tayloraswift/swift-hash/actions/workflows/ci.yml)
 [![swift package index versions](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Ftayloraswift%2Fswift-hash%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/tayloraswift/swift-hash)
@@ -33,9 +33,17 @@ This package vends the following library products:
 
     Implements [CRC-32](https://en.wikipedia.org/wiki/Cyclic_redundancy_check) checksums.
 
+1.  [`MD5`](https://swiftinit.org/docs/swift-hash/md5)
+
+    Implements [MD5](https://en.wikipedia.org/wiki/MD5) hashing function.
+
 1.  [`MessageAuthentication`](Sources/MessageAuthentication)
 
     Implements [hash-based message authentication codes](https://en.wikipedia.org/wiki/HMAC) (HMACs) through protocols that types in the other modules conform to.
+
+1.  [`SHA1`](https://swiftinit.org/docs/swift-hash/sha1)
+
+    Implements the [SHA-1](https://en.wikipedia.org/wiki/SHA-1) hashing function.
 
 1.  [`SHA2`](https://swiftinit.org/docs/swift-hash/sha2)
 
