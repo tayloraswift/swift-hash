@@ -75,7 +75,7 @@ extension MD5:CustomStringConvertible
 extension MD5:LosslessStringConvertible
 {
     public
-    init?(_ description:__shared String)
+    init?(_ description:borrowing String)
     {
         if  let buffer:InlineBuffer<Storage> = .init(description)
         {
@@ -88,7 +88,7 @@ extension MD5:LosslessStringConvertible
     }
 
     public
-    init?(_ description:__shared Substring)
+    init?(_ description:borrowing Substring)
     {
         if  let buffer:InlineBuffer<Storage> = .init(description)
         {
@@ -103,7 +103,7 @@ extension MD5:LosslessStringConvertible
 extension MD5:ExpressibleByIntegerLiteral
 {
     @inlinable public
-    init(integerLiteral:StaticBigInt)
+    init(integerLiteral:borrowing StaticBigInt)
     {
         self.init(buffer: .init(integerLiteral: integerLiteral))
     }

@@ -58,7 +58,7 @@ extension SHA1:CustomStringConvertible
 extension SHA1:LosslessStringConvertible
 {
     @inlinable public
-    init?(_ description:__shared String)
+    init?(_ description:borrowing String)
     {
         if  let buffer:InlineBuffer<Storage> = .init(description)
         {
@@ -71,7 +71,7 @@ extension SHA1:LosslessStringConvertible
     }
 
     @inlinable public
-    init?(_ description:__shared Substring)
+    init?(_ description:borrowing Substring)
     {
         if  let buffer:InlineBuffer<Storage> = .init(description)
         {
