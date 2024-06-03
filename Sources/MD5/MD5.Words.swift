@@ -12,7 +12,7 @@ extension MD5
         public
         var d:UInt32
 
-        @inlinable internal
+        @inlinable
         init(
             a:UInt32 = 0x6745_2301,
             b:UInt32 = 0xefcd_ab89,
@@ -28,7 +28,7 @@ extension MD5
 }
 extension MD5.Words
 {
-    @inlinable internal
+    @inlinable
     init(littleEndian storage:MD5.Storage)
     {
         self.init(
@@ -38,7 +38,7 @@ extension MD5.Words
             d: .init(littleEndian: storage.3))
     }
 
-    @inlinable internal
+    @inlinable
     var littleEndian:MD5.Storage
     {
         (
@@ -51,7 +51,7 @@ extension MD5.Words
 }
 extension MD5.Words
 {
-    @usableFromInline internal static
+    @usableFromInline static
     let shifts:[Int] =
     [
         7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22,
@@ -59,7 +59,7 @@ extension MD5.Words
         4, 11, 16, 23,  4, 11, 16, 23,  4, 11, 16, 23,  4, 11, 16, 23,
         6, 10, 15, 21,  6, 10, 15, 21,  6, 10, 15, 21,  6, 10, 15, 21,
     ]
-    @usableFromInline internal static
+    @usableFromInline static
     let table:[UInt32] =
     [
         0xd76a_a478, 0xe8c7_b756, 0x2420_70db, 0xc1bd_ceee,
@@ -82,7 +82,7 @@ extension MD5.Words
 }
 extension MD5.Words
 {
-    @inlinable internal mutating
+    @inlinable mutating
     func update(with block:MD5.Block)
     {
         var a:UInt32 = self.a
@@ -131,7 +131,7 @@ extension MD5.Words
         }
     }
 
-    @inlinable internal static
+    @inlinable static
     func rotate(_ value:UInt32, left shift:Int) -> UInt32
     {
         (value << shift) | (value >> (UInt32.bitWidth - shift))

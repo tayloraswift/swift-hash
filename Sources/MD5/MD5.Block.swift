@@ -15,7 +15,7 @@ extension MD5
         public
         var words:Words
 
-        @inlinable internal
+        @inlinable
         init(words:Words = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
         {
             self.words = words
@@ -24,7 +24,7 @@ extension MD5
 }
 extension MD5.Block
 {
-    @inlinable internal
+    @inlinable
     subscript(word:Int) -> UInt32
     {
         get
@@ -45,7 +45,7 @@ extension MD5.Block
 }
 extension MD5.Block
 {
-    @inlinable internal static
+    @inlinable static
     func copy(from bytes:some Collection<UInt8>) -> Self
     {
         withUnsafeTemporaryAllocation(
@@ -62,7 +62,7 @@ extension MD5.Block
             return block
         }
     }
-    @inlinable internal static
+    @inlinable static
     func copy(last bytes:some Collection<UInt8>, length:Int) -> (Self, Self?)
     {
         //  Zero-initialize

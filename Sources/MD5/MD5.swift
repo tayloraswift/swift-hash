@@ -1,13 +1,13 @@
 @frozen public
 struct MD5:Equatable, Hashable, Sendable
 {
-    @usableFromInline internal
+    @usableFromInline
     typealias Storage = (UInt32, UInt32, UInt32, UInt32)
 
-    @usableFromInline internal
+    @usableFromInline
     var buffer:InlineBuffer<Storage>
 
-    @inlinable internal
+    @inlinable
     init(buffer:InlineBuffer<Storage>)
     {
         self.buffer = buffer
