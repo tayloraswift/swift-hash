@@ -43,7 +43,7 @@ This package vends the following library products:
 
 1.  [`SHA1`](https://swiftinit.org/docs/swift-hash/sha1)
 
-    Implements the [SHA-1](https://en.wikipedia.org/wiki/SHA-1) hashing function.
+    Unimplemented: [SHA-1](https://en.wikipedia.org/wiki/SHA-1) hashing function.
 
 1.  [`SHA2`](https://swiftinit.org/docs/swift-hash/sha2)
 
