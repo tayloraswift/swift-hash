@@ -68,6 +68,14 @@ enum Base64
     @inlinable public static
     func encode<Bytes>(_ bytes:Bytes) -> String where Bytes:Sequence<UInt8>
     {
+        self.encode(bytes, padding: true)
+    }
+
+    /// Encodes a sequence of bytes to a base-64 string, padding the output with `=` characters
+    /// if `padding` is true.
+    @inlinable public static
+    func encode<Bytes>(_ bytes:Bytes, padding:Bool) -> String where Bytes:Sequence<UInt8>
+    {
         var encoded:String = ""
             encoded.reserveCapacity(bytes.underestimatedCount * 4 / 3)
         var bytes:Bytes.Iterator = bytes.makeIterator()
@@ -79,9 +87,14 @@ enum Base64
             else
             {
                 encoded.append(Digits[first  << 4])
-                encoded.append("=")
-                encoded.append("=")
-                continue
+
+                if  padding
+                {
+                    encoded.append("=")
+                    encoded.append("=")
+                }
+
+                break
             }
 
             encoded.append(    Digits[first  << 4 | second >> 4])
@@ -90,8 +103,12 @@ enum Base64
             else
             {
                 encoded.append(Digits[second << 2])
-                encoded.append("=")
-                continue
+
+                if  padding
+                {
+                    encoded.append("=")
+                }
+                break
             }
 
             encoded.append(    Digits[second << 2 | third  >> 6])
