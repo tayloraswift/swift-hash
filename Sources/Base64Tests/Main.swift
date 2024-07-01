@@ -145,5 +145,14 @@ enum Main:TestMain, TestBattery
                 }
             }
         }
+
+        if  let tests:TestGroup = tests / "URL"
+        {
+            let encoded:String = Base64.encode("<<???>>".utf8,
+                padding: false,
+                with: Base64.SafeDigits.self)
+
+            tests.expect(encoded ..? "PDw_Pz8-Pg")
+        }
     }
 }

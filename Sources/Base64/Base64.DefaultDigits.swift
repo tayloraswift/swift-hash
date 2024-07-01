@@ -3,10 +3,10 @@ import BaseDigits
 extension Base64
 {
     public
-    enum Digits
+    enum DefaultDigits
     {
-        public static
-        let ascii:[UInt8] =
+        @usableFromInline
+        static let ascii:[UInt8] =
         [
             0x41,
             0x42,
@@ -75,10 +75,10 @@ extension Base64
         ]
     }
 }
-extension Base64.Digits:BaseDigits
+extension Base64.DefaultDigits:BaseDigits
 {
-    @inlinable public static
-    subscript(remainder:UInt8) -> UInt8
+    @inlinable public
+    static subscript(remainder:UInt8) -> UInt8
     {
         Self.ascii[Int.init(remainder & 0b0011_1111)]
     }

@@ -15,8 +15,9 @@ enum Base64
     ///     This function uses the size of the input string to provide a capacity hint
     ///     for its output, and may over-allocate storage if the input contains many
     ///     non-digit characters.
-    @inlinable public static
-    func decode<Bytes>(_ ascii:some StringProtocol, to _:Bytes.Type = Bytes.self) -> Bytes
+    @inlinable public
+    static func decode<Bytes>(_ ascii:some StringProtocol,
+        to _:Bytes.Type = Bytes.self) -> Bytes
         where Bytes:RangeReplaceableCollection<UInt8>
     {
         self.decode(ascii.utf8, to: Bytes.self)
@@ -32,8 +33,9 @@ enum Base64
     ///     This function uses the size of the input string to provide a capacity hint
     ///     for its output, and may over-allocate storage if the input contains many
     ///     non-digit characters.
-    @inlinable public static
-    func decode<ASCII, Bytes>(_ ascii:ASCII, to _:Bytes.Type = Bytes.self) -> Bytes
+    @inlinable public
+    static func decode<ASCII, Bytes>(_ ascii:ASCII,
+        to _:Bytes.Type = Bytes.self) -> Bytes
         where Bytes:RangeReplaceableCollection<UInt8>, ASCII:Sequence<UInt8>
     {
         // https://en.wikipedia.org/wiki/Base64
@@ -65,23 +67,27 @@ enum Base64
     }
 
     /// Encodes a sequence of bytes to a base-64 string with padding if needed.
-    @inlinable public static
-    func encode<Bytes>(_ bytes:Bytes) -> String where Bytes:Sequence<UInt8>
+    @inlinable public
+    static func encode<Bytes>(_ bytes:Bytes) -> String where Bytes:Sequence<UInt8>
     {
-        self.encode(bytes, padding: true)
+        self.encode(bytes, padding: true, with: DefaultDigits.self)
     }
 
     /// Encodes a sequence of bytes to a base-64 string, padding the output with `=` characters
     /// if `padding` is true.
-    @inlinable public static
-    func encode<Bytes>(_ bytes:Bytes, padding:Bool) -> String where Bytes:Sequence<UInt8>
+    ///
+    /// The main use-case is `padding: false` with ``SafeDigits``.
+    @inlinable public
+    static func encode<Bytes, Digits>(_ bytes:Bytes,
+        padding:Bool,
+        with _:Digits.Type) -> String where Bytes:Sequence<UInt8>, Digits:BaseDigits
     {
         var encoded:String = ""
             encoded.reserveCapacity(bytes.underestimatedCount * 4 / 3)
         var bytes:Bytes.Iterator = bytes.makeIterator()
-        while let first:UInt8   = bytes.next()
+        while let first:UInt8 = bytes.next()
         {
-            encoded.append(    Digits[first  >> 2])
+            encoded.append(Digits[first  >> 2])
 
             guard let second:UInt8 = bytes.next()
             else
@@ -97,7 +103,7 @@ enum Base64
                 break
             }
 
-            encoded.append(    Digits[first  << 4 | second >> 4])
+            encoded.append(Digits[first  << 4 | second >> 4])
 
             guard let third:UInt8 = bytes.next()
             else
@@ -111,8 +117,8 @@ enum Base64
                 break
             }
 
-            encoded.append(    Digits[second << 2 | third  >> 6])
-            encoded.append(    Digits[third])
+            encoded.append(Digits[second << 2 | third  >> 6])
+            encoded.append(Digits[third])
         }
         return encoded
     }
