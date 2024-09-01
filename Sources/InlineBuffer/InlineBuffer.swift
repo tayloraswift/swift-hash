@@ -100,6 +100,7 @@ extension InlineBuffer:RandomAccessCollection, MutableCollection
         }
     }
 }
+@available(macOS 13.3, iOS 16.4, macCatalyst 16.4, tvOS 16.4, visionOS 1, watchOS 9.4, *)
 extension InlineBuffer:ExpressibleByIntegerLiteral
 {
     @inlinable public
@@ -153,18 +154,32 @@ extension InlineBuffer:CustomStringConvertible
     @inlinable public
     var description:String
     {
-        .init(unsafeUninitializedCapacity: 2 * self.count)
+        func hex(remainder:UInt8) -> UInt8
         {
-            func hex(remainder:UInt8) -> UInt8
+            (remainder < 10 ? 0x30 : 0x61 - 10) &+ remainder
+        }
+        if #available(macOS 11, iOS 14, macCatalyst 14, tvOS 14, visionOS 1, watchOS 7, *)
+        {
+            return .init(unsafeUninitializedCapacity: 2 * self.count)
             {
-                (remainder < 10 ? 0x30 : 0x61 - 10) &+ remainder
+                for (i, byte):(Int, UInt8) in self.enumerated()
+                {
+                    $0[2 * i    ] = hex(remainder: byte >> 4)
+                    $0[2 * i + 1] = hex(remainder: byte & 0x0f)
+                }
+                return 2 * self.count
             }
-            for (i, byte):(Int, UInt8) in self.enumerated()
+        }
+        else
+        {
+            var description:String = ""
+            description.reserveCapacity(2 * self.count)
+            for byte:UInt8 in self
             {
-                $0[2 * i    ] = hex(remainder: byte >> 4)
-                $0[2 * i + 1] = hex(remainder: byte & 0x0f)
+                description.append(Character.init(.init(hex(remainder: byte >> 4))))
+                description.append(Character.init(.init(hex(remainder: byte & 0x0f))))
             }
-            return 2 * self.count
+            return description
         }
     }
 }

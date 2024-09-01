@@ -3,7 +3,7 @@ import PackageDescription
 
 let package:Package = .init(
     name: "swift-hash",
-    platforms: [.macOS("13.3"), .iOS("16.4"), .tvOS("16.4"), .watchOS("9.4")],
+    platforms: [.macOS(.v10_15), .iOS(.v13), .tvOS(.v13), .watchOS(.v6)],
     products: [
         .library(name: "Base16",                targets: ["Base16"]),
         .library(name: "Base64",                targets: ["Base64"]),

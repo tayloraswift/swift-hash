@@ -100,6 +100,7 @@ extension MD5:LosslessStringConvertible
         }
     }
 }
+@available(macOS 13.3, iOS 16.4, macCatalyst 16.4, tvOS 16.4, visionOS 1, watchOS 9.4, *)
 extension MD5:ExpressibleByIntegerLiteral
 {
     @inlinable public
