@@ -7,6 +7,20 @@ enum Main:TestMain, TestBattery
     static
     func run(tests:TestGroup)
     {
+        guard #available(
+            macOS 13.3,
+            iOS 16.4,
+            macCatalyst 16.4,
+            tvOS 16.4,
+            visionOS 1.0,
+            watchOS 9.4,
+            *
+        )
+        else
+        {
+            fatalError("MD5Tests requires macOS 13.3+, iOS 16.4+, tvOS 16.4+, visionOS 1.0+, or watchOS 9.4+")
+        }
+
         if  let tests:TestGroup = tests / "Strings"
         {
             let string:String   =   "d41d8cd98f00b204e9800998ecf8427e"
