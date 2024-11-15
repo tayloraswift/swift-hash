@@ -32,7 +32,7 @@ extension MessageAuthenticationHash
     /// the given message using the given key.
     ///
     /// This initializer computes an instance of ``MessageAuthenticationKey``
-    /// and uses it to generate an instance of ``Self``. If you are reusing
+    /// and uses it to generate an instance of `Self`. If you are reusing
     /// the same `key` multiple times, it is more efficient to compute the
     /// message authentication key externally and call its
     /// ``MessageAuthenticationKey.authenticate(_:)`` method instead.
