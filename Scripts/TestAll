@@ -3,5 +3,5 @@ set -e
 swift --version
 swift build -c release
 for f in .build/release/*Tests; do
-  $f
+    $f
 done
