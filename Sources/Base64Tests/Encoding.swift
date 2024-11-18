@@ -109,7 +109,7 @@ struct Encoding
             expected: "light w"),
     ]
 
-    @Test(arguments: binary + string)
+    @Test(arguments: Self.binary + Self.string)
     static func defaultDigits(_ test:TestCase) throws
     {
         #expect(test.expected == Base64.decode(test.canonical.utf8, to: [UInt8].self))

@@ -220,7 +220,7 @@ struct ChecksumComputation
         expected: 0x71_0c_55_9e),
     ]
 
-    @Test(arguments: cases)
+    @Test(arguments: Self.cases)
     static func checksum(_ test:TestCase) throws
     {
         let computed:CRC32 = .init(hashing: test.message.utf8)
