@@ -1,22 +1,19 @@
-// swift-tools-version:5.8
+// swift-tools-version:6.0
 import PackageDescription
 
 let package:Package = .init(
     name: "swift-hash",
-    platforms: [.macOS(.v10_15), .iOS(.v13), .tvOS(.v13), .watchOS(.v6)],
+    platforms: [.macOS(.v14), .iOS(.v17), .tvOS(.v17), .visionOS(.v1), .watchOS(.v10)],
     products: [
-        .library(name: "Base16",                targets: ["Base16"]),
-        .library(name: "Base64",                targets: ["Base64"]),
-        .library(name: "CRC",                   targets: ["CRC"]),
-        .library(name: "InlineBuffer",          targets: ["InlineBuffer"]),
-        .library(name: "MD5",                   targets: ["MD5"]),
+        .library(name: "Base16", targets: ["Base16"]),
+        .library(name: "Base64", targets: ["Base64"]),
+        .library(name: "CRC", targets: ["CRC"]),
+        .library(name: "InlineBuffer", targets: ["InlineBuffer"]),
+        .library(name: "MD5", targets: ["MD5"]),
         .library(name: "MessageAuthentication", targets: ["MessageAuthentication"]),
-        .library(name: "SHA1",                  targets: ["SHA1"]),
-        .library(name: "SHA2",                  targets: ["SHA2"]),
-    ],
-    dependencies: [
-        .package(url: "https://github.com/tayloraswift/swift-grammar", .upToNextMinor(
-            from: "0.4.0")),
+        .library(name: "SHA1", targets: ["SHA1"]),
+        .library(name: "SHA2", targets: ["SHA2"]),
+        .library(name: "UUID", targets: ["UUID"]),
     ],
     targets: [
         .target(name: "BaseDigits"),
@@ -56,27 +53,28 @@ let package:Package = .init(
                 .target(name: "MessageAuthentication"),
             ]),
 
-        .executableTarget(name: "Base64Tests",
+        .target(name: "UUID",
             dependencies: [
-                .product(name: "Testing_", package: "swift-grammar"),
+                .target(name: "Base16"),
+            ]),
+
+        .testTarget(name: "Base64Tests",
+            dependencies: [
                 .target(name: "Base64"),
             ]),
 
-        .executableTarget(name: "CRCTests",
+        .testTarget(name: "CRCTests",
             dependencies: [
-                .product(name: "Testing_", package: "swift-grammar"),
                 .target(name: "CRC"),
             ]),
 
-        .executableTarget(name: "MD5Tests",
+        .testTarget(name: "MD5Tests",
             dependencies: [
                 .target(name: "MD5"),
-                .product(name: "Testing_", package: "swift-grammar"),
             ]),
 
-        .executableTarget(name: "SHA2Tests",
+        .testTarget(name: "SHA2Tests",
             dependencies: [
-                .product(name: "Testing_", package: "swift-grammar"),
                 .target(name: "SHA2"),
             ]),
     ]
@@ -87,12 +85,7 @@ for target:PackageDescription.Target in package.targets
     {
         var settings:[PackageDescription.SwiftSetting] = $0 ?? []
 
-        settings.append(.enableUpcomingFeature("BareSlashRegexLiterals"))
-        settings.append(.enableUpcomingFeature("ConciseMagicFile"))
-        settings.append(.enableUpcomingFeature("DeprecateApplicationMain"))
         settings.append(.enableUpcomingFeature("ExistentialAny"))
-        settings.append(.enableUpcomingFeature("GlobalConcurrency"))
-        settings.append(.enableUpcomingFeature("IsolatedDefaultValues"))
         settings.append(.enableExperimentalFeature("StrictConcurrency"))
 
         settings.append(.define("DEBUG", .when(configuration: .debug)))

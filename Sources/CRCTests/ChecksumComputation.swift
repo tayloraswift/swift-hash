@@ -1,20 +1,17 @@
 import CRC
-import Testing_
+import Testing
 
-@main
-enum Main:TestMain, TestBattery
+@Suite
+struct ChecksumComputation
 {
-   static
-   func run(tests:TestGroup)
-   {
-      // https://www.rfc-editor.org/rfc/rfc3720#appendix-B.4
-      let cases:[CRC32Test] =
-      [
-         .init(name: "basic", message: "123456789",
+    private
+    static let cases:[TestCase] = [
+        // https://www.rfc-editor.org/rfc/rfc3720#appendix-B.4
+        .init(name: "basic", message: "123456789",
             expected: 0xcb_f4_39_26),
 
-         .init(name: "apache-license",
-         message:
+        .init(name: "apache-license",
+            message:
             """
 
                                              Apache License
@@ -205,7 +202,7 @@ enum Main:TestMain, TestBattery
                   same "printed page" as the copyright notice for easier
                   identification within third-party archives.
 
-               Copyright 2022 Kelvin Ma (@taylorswift)
+               Copyright 2022 Dianna Ma (@taylorswift)
 
                Licensed under the Apache License, Version 2.0 (the "License");
                you may not use this file except in compliance with the License.
@@ -220,19 +217,13 @@ enum Main:TestMain, TestBattery
                limitations under the License.
 
             """,
-         expected: 0xaf_fb_88_44),
-      ]
+        expected: 0x71_0c_55_9e),
+    ]
 
-      for test:CRC32Test in cases
-      {
-            guard let tests:TestGroup = tests / test.name
-            else
-            {
-               continue
-            }
-
-            let computed:CRC32 = .init(hashing: test.message.utf8)
-            tests.expect(computed ==? test.expected)
-      }
-   }
+    @Test(arguments: Self.cases)
+    static func checksum(_ test:TestCase) throws
+    {
+        let computed:CRC32 = .init(hashing: test.message.utf8)
+        #expect(computed == test.expected)
+    }
 }
