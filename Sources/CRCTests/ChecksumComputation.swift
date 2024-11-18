@@ -202,7 +202,7 @@ struct ChecksumComputation
                   same "printed page" as the copyright notice for easier
                   identification within third-party archives.
 
-               Copyright 2022 Kelvin Ma (@taylorswift)
+               Copyright 2022 Dianna Ma (@taylorswift)
 
                Licensed under the Apache License, Version 2.0 (the "License");
                you may not use this file except in compliance with the License.
@@ -217,7 +217,7 @@ struct ChecksumComputation
                limitations under the License.
 
             """,
-        expected: 0xaf_fb_88_44),
+        expected: 0x71_0c_55_9e),
     ]
 
     @Test(arguments: cases)
