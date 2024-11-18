@@ -38,8 +38,8 @@ extension UUID
 {
     /// Generates an [RFC 4122](https://www.rfc-editor.org/rfc/rfc4122)-compliant
     /// random UUID (version 4).
-    @inlinable public static
-    func random() -> Self
+    @inlinable public
+    static func random() -> Self
     {
         var bitPattern:(UInt64, UInt64) =
         (
