@@ -18,7 +18,7 @@
 
 ## Requirements
 
-The swift-hash library requires Swift 5.9 or later.
+The swift-hash library requires Swift 6.0 or later.
 
 
 | Platform | Status |

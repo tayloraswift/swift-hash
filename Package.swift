@@ -1,4 +1,4 @@
-// swift-tools-version:5.9
+// swift-tools-version:6.0
 import PackageDescription
 
 let package:Package = .init(
@@ -93,12 +93,7 @@ for target:PackageDescription.Target in package.targets
     {
         var settings:[PackageDescription.SwiftSetting] = $0 ?? []
 
-        settings.append(.enableUpcomingFeature("BareSlashRegexLiterals"))
-        settings.append(.enableUpcomingFeature("ConciseMagicFile"))
-        settings.append(.enableUpcomingFeature("DeprecateApplicationMain"))
         settings.append(.enableUpcomingFeature("ExistentialAny"))
-        settings.append(.enableUpcomingFeature("GlobalConcurrency"))
-        settings.append(.enableUpcomingFeature("IsolatedDefaultValues"))
         settings.append(.enableExperimentalFeature("StrictConcurrency"))
 
         settings.append(.define("DEBUG", .when(configuration: .debug)))
