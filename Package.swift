@@ -1,18 +1,19 @@
-// swift-tools-version:5.8
+// swift-tools-version:5.9
 import PackageDescription
 
 let package:Package = .init(
     name: "swift-hash",
     platforms: [.macOS(.v10_15), .iOS(.v13), .tvOS(.v13), .watchOS(.v6)],
     products: [
-        .library(name: "Base16",                targets: ["Base16"]),
-        .library(name: "Base64",                targets: ["Base64"]),
-        .library(name: "CRC",                   targets: ["CRC"]),
-        .library(name: "InlineBuffer",          targets: ["InlineBuffer"]),
-        .library(name: "MD5",                   targets: ["MD5"]),
+        .library(name: "Base16", targets: ["Base16"]),
+        .library(name: "Base64", targets: ["Base64"]),
+        .library(name: "CRC", targets: ["CRC"]),
+        .library(name: "InlineBuffer", targets: ["InlineBuffer"]),
+        .library(name: "MD5", targets: ["MD5"]),
         .library(name: "MessageAuthentication", targets: ["MessageAuthentication"]),
-        .library(name: "SHA1",                  targets: ["SHA1"]),
-        .library(name: "SHA2",                  targets: ["SHA2"]),
+        .library(name: "SHA1", targets: ["SHA1"]),
+        .library(name: "SHA2", targets: ["SHA2"]),
+        .library(name: "UUID", targets: ["UUID"]),
     ],
     dependencies: [
         .package(url: "https://github.com/tayloraswift/swift-grammar", .upToNextMinor(
@@ -54,6 +55,11 @@ let package:Package = .init(
             dependencies: [
                 .target(name: "Base16"),
                 .target(name: "MessageAuthentication"),
+            ]),
+
+        .target(name: "UUID",
+            dependencies: [
+                .target(name: "Base16"),
             ]),
 
         .executableTarget(name: "Base64Tests",
