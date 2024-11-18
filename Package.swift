@@ -62,15 +62,13 @@ let package:Package = .init(
                 .target(name: "Base16"),
             ]),
 
-        .executableTarget(name: "Base64Tests",
+        .testTarget(name: "Base64Tests",
             dependencies: [
-                .product(name: "Testing_", package: "swift-grammar"),
                 .target(name: "Base64"),
             ]),
 
-        .executableTarget(name: "CRCTests",
+        .testTarget(name: "CRCTests",
             dependencies: [
-                .product(name: "Testing_", package: "swift-grammar"),
                 .target(name: "CRC"),
             ]),
 

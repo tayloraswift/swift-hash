@@ -1,24 +1,27 @@
 import Base64
 
-struct Base64Test
+extension Encoding
 {
-    let name:String
-    let degenerate:String?
-    let canonical:String
-    let expected:[UInt8]
-
-    init(name:String,
-        degenerate:String? = nil,
-        canonical:String,
-        expected:[UInt8])
+    struct TestCase
     {
-        self.name = name
-        self.degenerate = degenerate
-        self.canonical = canonical
-        self.expected = expected
+        let name:String
+        let degenerate:String?
+        let canonical:String
+        let expected:[UInt8]
+
+        init(name:String,
+            degenerate:String? = nil,
+            canonical:String,
+            expected:[UInt8])
+        {
+            self.name = name
+            self.degenerate = degenerate
+            self.canonical = canonical
+            self.expected = expected
+        }
     }
 }
-extension Base64Test
+extension Encoding.TestCase
 {
     init<UTF8>(name:String,
         degenerate:String? = nil,
