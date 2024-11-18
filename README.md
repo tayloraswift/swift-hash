@@ -65,3 +65,7 @@ This package vends the following library products:
 1.  [`SHA2`](https://swiftinit.org/docs/swift-hash/sha2)
 
     Implements the [SHA-256](https://en.wikipedia.org/wiki/SHA-2) hashing function.
+
+1.  [`UUID`](https://swiftinit.org/docs/swift-hash/uuid)
+
+    Provides a UUID type.
