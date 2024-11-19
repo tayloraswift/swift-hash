@@ -5,6 +5,7 @@ import Testing
 @Suite
 struct Hashing
 {
+    @available(macOS 13.3, iOS 16.4, macCatalyst 16.4, tvOS 16.4, visionOS 1.0, watchOS 9.4, *)
     @Test(arguments: [
             (0xd41d8cd98f00b204e9800998ecf8427e, []),
             (0x0cc175b9c0f1b6a831c399e269772661, [0x61]),
