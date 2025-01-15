@@ -32,7 +32,7 @@ struct CRC32:Hashable, Sendable
     }
 
     /// Returns a new checksum by hashing the provided message into the current checksum.
-    @inlinable public
+    @inlinable public consuming
     func updated(with message:borrowing some Sequence<UInt8>) -> Self
     {
         var checksum:Self = self
@@ -44,11 +44,11 @@ struct CRC32:Hashable, Sendable
     ///
     /// This manually specialized implementation is much faster in debug mode than the
     /// generic implementation, but exactly the same in release mode.
-    @inlinable public
-    func updated(with message:borrowing [UInt8]) -> Self
+    @inlinable public consuming
+    func _updated(with message:borrowing [UInt8]) -> Self
     {
         var checksum:Self = self
-        checksum.update(with: message)
+        checksum._update(with: message)
         return checksum
     }
 
@@ -60,26 +60,7 @@ struct CRC32:Hashable, Sendable
         {
             (state:UInt32, byte:UInt8) in
             let indexByte:UInt8 = UInt8.init(truncatingIfNeeded: state) ^ byte
-            let index:Int
-            #if DEBUG
-                // in debug mode these hacky integer conversions make this function
-                // around 35% faster
-                if MemoryLayout<Int>.stride == 8 {
-                    let tuple:(UInt8, UInt8, UInt8, UInt8, UInt8, UInt8, UInt8, UInt8) =
-                    (
-                        indexByte, 0, 0, 0, 0, 0, 0, 0
-                    )
-                    index = unsafeBitCast(tuple, to: Int.self)
-                } else {
-                    let tuple:(UInt8, UInt8, UInt8, UInt8) =
-                    (
-                        indexByte, 0, 0, 0
-                    )
-                    index = unsafeBitCast(tuple, to: Int.self)
-                }
-            #else
-                index = Int.init(indexByte)
-            #endif
+            let index:Int = Int.init(indexByte)
             return Self.table[index] ^ state >> 8
         }
     }
@@ -89,7 +70,7 @@ struct CRC32:Hashable, Sendable
     /// This manually specialized implementation is much faster in debug mode than the
     /// generic implementation, but exactly the same in release mode.
     @inlinable public mutating
-    func update(with message:borrowing [UInt8])
+    func _update(with message:borrowing [UInt8])
     {
         #if DEBUG
             // in debug mode this manually specialized version of `reduce` is about 2.8x faster
