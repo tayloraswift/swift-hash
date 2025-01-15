@@ -32,11 +32,23 @@ struct CRC32:Hashable, Sendable
     }
 
     /// Returns a new checksum by hashing the provided message into the current checksum.
-    @inlinable public
+    @inlinable public consuming
     func updated(with message:borrowing some Sequence<UInt8>) -> Self
     {
         var checksum:Self = self
         checksum.update(with: message)
+        return checksum
+    }
+
+    /// Returns a new checksum by hashing the provided message into the current checksum.
+    ///
+    /// This manually specialized implementation is much faster in debug mode than the
+    /// generic implementation, but exactly the same in release mode.
+    @inlinable public consuming
+    func _updated(with message:borrowing [UInt8]) -> Self
+    {
+        var checksum:Self = self
+        checksum._update(with: message)
         return checksum
     }
 
@@ -47,8 +59,51 @@ struct CRC32:Hashable, Sendable
         self.checksum = ~message.reduce(~self.checksum)
         {
             (state:UInt32, byte:UInt8) in
-            Self.table[Int.init(UInt8.init(truncatingIfNeeded: state) ^ byte)] ^ state >> 8
+            let indexByte:UInt8 = UInt8.init(truncatingIfNeeded: state) ^ byte
+            let index:Int = Int.init(indexByte)
+            return Self.table[index] ^ state >> 8
         }
+    }
+
+    /// Updates the checksum by hashing the provided message into the existing checksum.
+    ///
+    /// This manually specialized implementation is much faster in debug mode than the
+    /// generic implementation, but exactly the same in release mode.
+    @inlinable public mutating
+    func _update(with message:borrowing [UInt8])
+    {
+        #if DEBUG
+            // in debug mode this manually specialized version of `reduce` is about 2.8x faster
+            self.checksum = ~self.checksum
+            var i:Int = 0
+            while i < message.count
+            {
+                let state:UInt32 = self.checksum
+                let byte:UInt8 = message[i]
+                let indexByte:UInt8 = UInt8.init(truncatingIfNeeded: state) ^ byte
+                let index:Int
+                // in debug mode these hacky integer conversions make this function
+                // around 35% faster
+                if MemoryLayout<Int>.stride == 8 {
+                    let tuple:(UInt8, UInt8, UInt8, UInt8, UInt8, UInt8, UInt8, UInt8) =
+                    (
+                        indexByte, 0, 0, 0, 0, 0, 0, 0
+                    )
+                    index = unsafeBitCast(tuple, to: Int.self)
+                } else {
+                    let tuple:(UInt8, UInt8, UInt8, UInt8) =
+                    (
+                        indexByte, 0, 0, 0
+                    )
+                    index = unsafeBitCast(tuple, to: Int.self)
+                }
+                self.checksum = Self.table[index] ^ state >> 8
+                i += 1
+            }
+            self.checksum = ~self.checksum
+        #else
+            self.update(with: message[...])
+        #endif
     }
 }
 extension CRC32:ExpressibleByIntegerLiteral
